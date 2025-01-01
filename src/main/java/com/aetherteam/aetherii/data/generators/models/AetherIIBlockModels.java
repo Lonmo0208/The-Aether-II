@@ -65,9 +65,9 @@ public class AetherIIBlockModels extends AetherIIBlockModelSubProvider {
         this.createArcticSnowBlocks();
 //        this.createTranslucentCube(AetherIIBlocks.ARCTIC_ICE.get());
         this.createTrivialCube(AetherIIBlocks.ARCTIC_PACKED_ICE.get());
-//        this.createCrystal(AetherIIBlocks.LARGE_ARCTIC_ICE_CRYSTAL.get());
-//        this.createCrystal(AetherIIBlocks.MEDIUM_ARCTIC_ICE_CRYSTAL.get());
-//        this.createCrystal(AetherIIBlocks.SMALL_ARCTIC_ICE_CRYSTAL.get());
+        this.createAmethystCluster(AetherIIBlocks.LARGE_ARCTIC_ICE_CRYSTAL.get());
+        this.createAmethystCluster(AetherIIBlocks.MEDIUM_ARCTIC_ICE_CRYSTAL.get());
+        this.createAmethystCluster(AetherIIBlocks.SMALL_ARCTIC_ICE_CRYSTAL.get());
         this.createFullAndCarpetBlocks(AetherIIBlocks.SHAYELINN_MOSS_BLOCK.get(), AetherIIBlocks.SHAYELINN_MOSS_CARPET.get());
 //        this.createVine(AetherIIBlocks.SHAYELINN_MOSS_VINES.get()); //todo
         this.createCustomFlowerBed(AetherIIBlocks.HOLPUPEA.get(),
@@ -99,7 +99,7 @@ public class AetherIIBlockModels extends AetherIIBlockModelSubProvider {
         this.createTrivialCube(AetherIIBlocks.UNDERSHALE_ARKENIUM_ORE.get());
         this.createTrivialCube(AetherIIBlocks.UNDERSHALE_GRAVITITE_ORE.get());
         this.createTrivialCube(AetherIIBlocks.CORROBONITE_ORE.get());
-//        this.createCrystal(AetherIIBlocks.CORROBONITE_CLUSTER.get());
+        this.createAmethystCluster(AetherIIBlocks.CORROBONITE_CLUSTER.get());
 //
 //        // Aerclouds
 //        this.createTranslucentCube(AetherIIBlocks.COLD_AERCLOUD.get()); //todo translucent interior

@@ -148,11 +148,14 @@ public class AetherIIBlockModelSubProvider extends BlockModelGenerators {
 //                .with(VariantProperties.MODEL, AetherIIModelTemplates.TEMPLATE_CUTOUT_CROSS.createWithSuffix(block, name, mapping, blockModels.modelOutput));
 //    }
 //
-//    public void createCrystal(BlockModelGenerators blockModels, Block block) {
-//        blockModels.blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, Variant.variant()
-//                .with(VariantProperties.MODEL, AetherIIModelTemplates.TEMPLATE_CUTOUT_CROSS.create(block, TextureMapping.cross(block), blockModels.modelOutput))).with(blockModels.createColumnWithFacing()));
-//        blockModels.registerSimpleFlatItemModel(block);
-//    }
+
+    @Override
+    public void createAmethystCluster(Block block) {
+        this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(block, Variant.variant().with(VariantProperties.MODEL,
+                AetherIIModelTemplates.TEMPLATE_CUTOUT_CROSS.create(block, TextureMapping.cross(block), this.modelOutput))).with(this.createColumnWithFacing()));
+        this.registerSimpleFlatItemModel(block);
+    }
+
 //
 //    public void createVine(BlockModelGenerators blockModels, Block block) {
 //        blockModels.createMultifaceBlockStates(block);
