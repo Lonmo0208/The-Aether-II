@@ -1386,6 +1386,14 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
                 .add(AetherIIItems.ARKENIUM_TROWEL.toStack(), 1)
                 .add(AetherIIItems.GRAVITITE_TROWEL.toStack(), 1)
                 .build(), AetherIIItems.IRRADIATED_TOOL, this.output);
+        this.irradiationCleansing(RecipeCategory.MISC, SimpleWeightedRandomList.<ItemStack>builder()
+                .add(AetherIIItems.MUSIC_DISC_AETHER_TUNE.toStack(), 1)
+                .add(AetherIIItems.MUSIC_DISC_ASCENDING_DAWN.toStack(), 1)
+                .add(AetherIIItems.MUSIC_DISC_AERWHALE.toStack(), 1)
+                .add(AetherIIItems.MUSIC_DISC_APPROACHES.toStack(), 1)
+                .add(AetherIIItems.MUSIC_DISC_DEMISE.toStack(), 1)
+                .add(AetherIIItems.RECORDING_892.toStack(), 1)
+                .build(), AetherIIItems.IRRADIATED_CHUNK, this.output);
 
         ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.BUILDING_BLOCKS, AetherIIBlocks.IRRADIATED_SKYROOT_LEAF_PILE, 1).requires(AetherIIBlocks.SKYROOT_LEAF_PILE.get()).requires(AetherIIItems.IRRADIATED_DUST.get())
                 .group("irradiated_leaf_pile").unlockedBy(getHasName(AetherIIItems.IRRADIATED_DUST), has(AetherIIItems.IRRADIATED_DUST)).save(this.output, this.name("skyroot_leaf_pile_irradiation_crafting"));

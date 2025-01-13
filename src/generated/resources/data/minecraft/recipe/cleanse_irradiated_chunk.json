@@ -1,0 +1,48 @@
+{
+  "type": "aether_ii:irradiation_cleansing",
+  "ingredient": "aether_ii:irradiated_chunk",
+  "results": [
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:music_disc_aether_tune"
+      },
+      "weight": 1
+    },
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:music_disc_ascending_dawn"
+      },
+      "weight": 1
+    },
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:music_disc_aerwhale"
+      },
+      "weight": 1
+    },
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:music_disc_approaches"
+      },
+      "weight": 1
+    },
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:music_disc_demise"
+      },
+      "weight": 1
+    },
+    {
+      "data": {
+        "count": 1,
+        "id": "aether_ii:recording_892"
+      },
+      "weight": 1
+    }
+  ]
+}
