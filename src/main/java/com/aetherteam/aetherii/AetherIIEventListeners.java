@@ -8,6 +8,7 @@ import com.aetherteam.aetherii.event.FreezeEvent;
 import com.aetherteam.aetherii.event.hooks.BlockHooks;
 import com.aetherteam.aetherii.event.hooks.PlayerHooks;
 import com.aetherteam.aetherii.item.components.AetherIIDataComponents;
+import com.aetherteam.aetherii.world.DynamicWorldLights;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,6 +38,7 @@ import net.neoforged.neoforge.event.level.AlterGroundEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.SleepFinishedTimeEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Map;
@@ -74,6 +76,9 @@ public class AetherIIEventListeners {
         bus.addListener(AetherIIEventListeners::onAlterGround);
         bus.addListener(AetherIIEventListeners::onBlockFreeze);
         bus.addListener(AetherIIEventListeners::onBreatheInBlock);
+
+        // Level
+        bus.addListener(AetherIIEventListeners::onLevelPostTick);
     }
 
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -208,6 +213,7 @@ public class AetherIIEventListeners {
             livingEntity.getData(AetherIIDataAttachments.DAMAGE_SYSTEM).postTickUpdate(livingEntity);
             livingEntity.getData(AetherIIDataAttachments.EFFECTS_SYSTEM).postTickUpdate(livingEntity);
         }
+        DynamicWorldLights.entityTick(entity);
     }
 
     public static void onLivingPreDamaged(LivingDamageEvent.Pre event) {
@@ -301,5 +307,10 @@ public class AetherIIEventListeners {
         if (effect.is(AetherIITags.MobEffects.MILK_DOESNT_CLEAR) && livingEntity.getUseItem().is(Tags.Items.BUCKETS_MILK)) {
             event.setCanceled(true);
         }
+    }
+
+    public static void onLevelPostTick(LevelTickEvent.Post event) {
+        Level level = event.getLevel();
+        DynamicWorldLights.levelTick(level);
     }
 }
