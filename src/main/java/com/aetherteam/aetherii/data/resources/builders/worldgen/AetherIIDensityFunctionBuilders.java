@@ -19,6 +19,7 @@ public class AetherIIDensityFunctionBuilders {
     public static final ResourceKey<DensityFunction> VEGETATION = createKey("highlands/vegetation");
     public static final ResourceKey<DensityFunction> VEGETATION_RARE = createKey("highlands/vegetation_rare");
     public static final ResourceKey<DensityFunction> VEGETATION_RARITY_MAPPER = createKey("highlands/vegetation_rarity_mapper");
+    public static final ResourceKey<DensityFunction> CONTINENTS = createKey("highlands/continents");
     public static final ResourceKey<DensityFunction> EROSION = createKey("highlands/erosion");
     public static final ResourceKey<DensityFunction> DEPTH = createKey("highlands/depth");
     public static final ResourceKey<DensityFunction> AMPLIFICATION = createKey("highlands/amplification");

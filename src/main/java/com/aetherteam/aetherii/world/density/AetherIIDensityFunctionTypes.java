@@ -11,4 +11,5 @@ public class AetherIIDensityFunctionTypes {
     public static final DeferredRegister<MapCodec<? extends DensityFunction>> DENSITY_FUNCTION_TYPES = DeferredRegister.create(BuiltInRegistries.DENSITY_FUNCTION_TYPE, AetherII.MODID);
 
     public static DeferredHolder<MapCodec<? extends DensityFunction>, ? extends MapCodec<? extends DensityFunction>> PERLIN_NOISE = DENSITY_FUNCTION_TYPES.register("perlin_noise", PerlinNoiseFunction.CODEC::codec);
+    public static DeferredHolder<MapCodec<? extends DensityFunction>, ? extends MapCodec<? extends DensityFunction>> VOID_DETERMINATION = DENSITY_FUNCTION_TYPES.register("void_determination", VoidDeterminationFunction.CODEC::codec);
 }
