@@ -108,6 +108,7 @@ dependencies {
 }
 
 repositories {
+    mavenLocal()
     maven { url = "https://jitpack.io" }
     maven { url = "https://maven.blamejared.com" }
     maven { url = "https://www.cursemaven.com" }
@@ -120,7 +121,6 @@ repositories {
     maven { url = "https://maven.su5ed.dev/releases" }
     maven githubPackage.invoke("The-Aether-Team/Nitrogen")
     maven githubPackage.invoke("The-Aether-Team/Cumulus")
-    mavenLocal()
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
