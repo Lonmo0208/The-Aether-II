@@ -109,6 +109,8 @@ dependencies {
 
 repositories {
     mavenLocal()
+    maven { url = "https://packages.aether-mod.net/Nitrogen" }
+    maven { url = "https://packages.aether-mod.net/Cumulus" }
     maven { url = "https://jitpack.io" }
     maven { url = "https://maven.blamejared.com" }
     maven { url = "https://www.cursemaven.com" }
