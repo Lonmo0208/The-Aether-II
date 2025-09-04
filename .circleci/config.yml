@@ -33,7 +33,7 @@ commands:
             - run: ./gradlew build --parallel --console=plain
       - store_artifacts:
           path: ~/project/build/libs
-
+          
 workflows:
   start:
     jobs:
