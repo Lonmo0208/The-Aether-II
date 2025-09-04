@@ -4,6 +4,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.neoforged.moddev' version "${moddevgradle_version}"
+    id 'io.github.0ffz.github-packages' version '[1,2)'
     id 'com.matthewprenger.cursegradle' version '[1.4,1.5)'
     id 'com.modrinth.minotaur' version '[2,3)'
 }
@@ -74,7 +75,7 @@ configurations {
 dependencies {
     implementation "com.aetherteam.nitrogen:nitrogen_internals:${project.nitrogen_version}"
     implementation "com.aetherteam.cumulus:cumulus_menus:${project.cumulus_version}"
-    implementation "io.wispforest:accessories-neoforge:${project.accessories_version}+${project.minecraft_version}"
+    implementation "io.wispforest:accessories-neoforge:${project.accessories_version}+${project.minecraft_versions}"
 
     runtimeOnly "curse.maven:worldedit-225608:6122278"
 
@@ -96,19 +97,22 @@ dependencies {
         }
     }
 
-    jarJar("io.wispforest:accessories-neoforge:${project.accessories_version}+${project.minecraft_version}") {
+    jarJar("io.wispforest:accessories-neoforge:${project.accessories_version}+${project.minecraft_versions}") {
         version {
-            strictly "[${project.accessories_version}+${project.minecraft_version},)"
-            prefer "${project.accessories_version}+${project.minecraft_version}"
+            strictly "[${project.accessories_version}+${project.minecraft_versions},)"
+            prefer "${project.accessories_version}+${project.minecraft_versions}"
         }
     }
 
-//    runtimeOnly "io.github.flemmli97:debugutils:1.21-${project.debugutils_version}-neoforge"
+    //runtimeOnly "io.github.flemmli97:debugutils:1.21-${project.debugutils_version}-neoforge"
 
     //compileOnly fileTree(dir: 'libs', include: '*.jar')
 }
 
 repositories {
+    mavenLocal()
+    maven { url = "https://packages.aether-mod.net/Nitrogen" }
+    maven { url = "https://packages.aether-mod.net/Cumulus" }
     maven { url = "https://jitpack.io" }
     maven { url = "https://maven.blamejared.com" }
     maven { url = "https://www.cursemaven.com" }
@@ -119,9 +123,8 @@ repositories {
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://maven.fabricmc.net" }
     maven { url = "https://maven.su5ed.dev/releases" }
-    maven { url = "https://packages.aether-mod.net/Nitrogen" }
-    maven { url = "https://packages.aether-mod.net/Cumulus" }
-    mavenLocal()
+    maven githubPackage.invoke("The-Aether-Team/Nitrogen")
+    maven githubPackage.invoke("The-Aether-Team/Cumulus")
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
