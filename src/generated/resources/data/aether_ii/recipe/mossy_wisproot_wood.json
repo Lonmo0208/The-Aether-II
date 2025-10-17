@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "aether_ii:wisproot_wood",
+    "aether_ii:bryalinn_moss_vines",
+    "aether_ii:bryalinn_moss_vines"
+  ],
+  "result": {
+    "count": 1,
+    "id": "aether_ii:mossy_wisproot_wood"
+  }
+}
