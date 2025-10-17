@@ -118,8 +118,9 @@ public class AetherIITags {
         public static final TagKey<Item> UNIQUE_TOOLTIP_COLOR = tag("unique_tooltip_color");
 
         public static final TagKey<Item> CRAFTS_SKYROOT_PLANKS = tag("crafts_skyroot_planks");
-        public static final TagKey<Item> CRAFTS_GREATROOT_PLANKS = tag("crafts_greatroot_planks");
-        public static final TagKey<Item> CRAFTS_WISPROOT_PLANKS = tag("crafts_wisproot_planks");
+    public static final TagKey<Item> CRAFTS_GREATROOT_PLANKS = tag("crafts_greatroot_planks");
+    public static final TagKey<Item> CRAFTS_WISPROOT_PLANKS = tag("crafts_wisproot_planks");
+    public static final TagKey<Item> CRAFTS_AMBEROOT_PLANKS = tag("crafts_amberoot_planks");
         public static final TagKey<Item> PLANKS_CRAFTING = tag("planks_crafting");
         public static final TagKey<Item> STONE_CRAFTING = tag("stone_crafting");
         public static final TagKey<Item> CRAFTS_SKYROOT_STICKS = tag("crafts_skyroot_sticks");
@@ -179,6 +180,7 @@ public class AetherIITags {
     }
 
     public static class Fluids {
+        public static final TagKey<Fluid> ALKAHEST = tag("alkahest");
         public static final TagKey<Fluid> ACID = tag("acid");
 
         public static final TagKey<Fluid> ALLOWED_BUCKET_PICKUP = tag("allowed_bucket_pickup");

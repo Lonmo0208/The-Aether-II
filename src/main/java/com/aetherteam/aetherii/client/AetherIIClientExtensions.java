@@ -114,11 +114,17 @@ public class AetherIIClientExtensions {
     public static final IClientFluidTypeExtensions ACID_FLUID = new IClientFluidTypeExtensions() {
         @Override
         public ResourceLocation getStillTexture() {
+            if (this.type().equals(AetherIIFluidTypes.ALKAHEST_TYPE.get())) {
+                return ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "fluid/alkahest_still");
+            }
             return ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "fluid/acid_still");
         }
 
         @Override
         public ResourceLocation getFlowingTexture() {
+            if (this.type().equals(AetherIIFluidTypes.ALKAHEST_TYPE.get())) {
+                return ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "fluid/alkahest_flow");
+            }
             return ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "fluid/acid_flow");
         }
 

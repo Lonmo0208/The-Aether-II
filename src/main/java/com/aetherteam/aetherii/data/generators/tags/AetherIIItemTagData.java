@@ -147,10 +147,14 @@ public class AetherIIItemTagData extends ItemTagsProvider {
         this.tag(AetherIITags.Items.CRAFTS_WISPROOT_PLANKS).addTag(
                 AetherIITags.Items.WISPROOT_LOGS
         );
+        this.tag(AetherIITags.Items.CRAFTS_AMBEROOT_PLANKS).addTag(
+                AetherIITags.Items.AMBEROOT_LOGS
+        );
         this.tag(AetherIITags.Items.PLANKS_CRAFTING).add(
                 AetherIIBlocks.SKYROOT_PLANKS.asItem(),
                 AetherIIBlocks.GREATROOT_PLANKS.asItem(),
-                AetherIIBlocks.WISPROOT_PLANKS.asItem()
+                AetherIIBlocks.WISPROOT_PLANKS.asItem(),
+                AetherIIBlocks.AMBEROOT_PLANKS.asItem()
         );
         this.tag(AetherIITags.Items.STONE_CRAFTING).add(
                 AetherIIBlocks.HOLYSTONE.asItem()
@@ -158,7 +162,8 @@ public class AetherIIItemTagData extends ItemTagsProvider {
         this.tag(AetherIITags.Items.CRAFTS_SKYROOT_STICKS).add(
                 AetherIIBlocks.SKYROOT_PLANKS.asItem(),
                 AetherIIBlocks.GREATROOT_PLANKS.asItem(),
-                AetherIIBlocks.WISPROOT_PLANKS.asItem()
+                AetherIIBlocks.WISPROOT_PLANKS.asItem(),
+                AetherIIBlocks.AMBEROOT_PLANKS.asItem()
         );
         this.tag(AetherIITags.Items.CRAFTS_SKYROOT_TOOLS).add(
                 AetherIIBlocks.SKYROOT_PLANKS.asItem(),

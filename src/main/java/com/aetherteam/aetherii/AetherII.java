@@ -1,8 +1,13 @@
 package com.aetherteam.aetherii;
 
+import com.aetherteam.aetherii.api.SkyrootLizardVariant;
+import com.aetherteam.aetherii.api.SwetVariant;
 import com.aetherteam.aetherii.api.guidebook.BestiaryEntry;
 import com.aetherteam.aetherii.api.guidebook.EffectsEntry;
 import com.aetherteam.aetherii.api.guidebook.ExplorationEntry;
+import com.aetherteam.aetherii.api.guidebook.RewardWrapper;
+import com.aetherteam.aetherii.api.styles.StyleDesign;
+import com.aetherteam.aetherii.api.styles.StyleMaterial;
 import com.aetherteam.aetherii.attachment.AetherIIDataAttachments;
 import com.aetherteam.aetherii.block.*;
 import com.aetherteam.aetherii.blockentity.AetherIIBlockEntityTypes;
@@ -14,16 +19,18 @@ import com.aetherteam.aetherii.data.ReloadListeners;
 import com.aetherteam.aetherii.data.resources.AetherIIMobCategory;
 import com.aetherteam.aetherii.data.resources.registries.*;
 import com.aetherteam.aetherii.effect.AetherIIEffects;
-import com.aetherteam.aetherii.entity.AetherIIAttributes;
 import com.aetherteam.aetherii.entity.AetherIIDataSerializers;
 import com.aetherteam.aetherii.entity.AetherIIEntityTypes;
-import com.aetherteam.aetherii.entity.ai.memory.AetherIIMemoryModuleTypes;
+import com.aetherteam.aetherii.entity.ai.brain.memory.AetherIIMemoryModuleTypes;
+import com.aetherteam.aetherii.entity.ai.brain.sensor.AetherIISensorTypes;
+import com.aetherteam.aetherii.entity.attributes.AetherIIAttributes;
 import com.aetherteam.aetherii.inventory.AetherIIAccessorySlots;
 import com.aetherteam.aetherii.inventory.AetherIIRecipeBookTypes;
 import com.aetherteam.aetherii.inventory.menu.AetherIIMenuTypes;
 import com.aetherteam.aetherii.item.AetherIICreativeTabs;
 import com.aetherteam.aetherii.item.AetherIIItems;
 import com.aetherteam.aetherii.item.components.AetherIIDataComponents;
+import com.aetherteam.aetherii.item.consumeeffect.AetherIIConsumeEffectTypes;
 import com.aetherteam.aetherii.item.equipment.armor.AetherIIArmorMaterials;
 import com.aetherteam.aetherii.loot.functions.AetherIILootFunctions;
 import com.aetherteam.aetherii.loot.modifiers.AetherIILootModifiers;
@@ -31,9 +38,13 @@ import com.aetherteam.aetherii.network.packet.AetherIIPlayerSyncPacket;
 import com.aetherteam.aetherii.network.packet.CurrencySyncPacket;
 import com.aetherteam.aetherii.network.packet.DamageSystemSyncPacket;
 import com.aetherteam.aetherii.network.packet.OutpostTrackerSyncPacket;
+import com.aetherteam.aetherii.advancement.predicate.AetherIIEntitySubPredicates;
 import com.aetherteam.aetherii.network.packet.clientbound.*;
 import com.aetherteam.aetherii.network.packet.serverbound.*;
+import com.aetherteam.aetherii.recipe.book.AetherIIRecipeBookCategories;
+import com.aetherteam.aetherii.recipe.display.AetherIIRecipeDisplays;
 import com.aetherteam.aetherii.recipe.recipes.AetherIIRecipeTypes;
+import com.aetherteam.aetherii.recipe.set.AetherIIRecipePropertySets;
 import com.aetherteam.aetherii.recipe.serializer.AetherIIRecipeSerializers;
 import com.aetherteam.aetherii.world.AetherIIPoi;
 import com.aetherteam.aetherii.world.density.AetherIIDensityFunctionTypes;
@@ -42,6 +53,11 @@ import com.aetherteam.aetherii.world.feature.modifier.filter.AetherIIPlacementMo
 import com.aetherteam.aetherii.world.feature.modifier.predicate.AetherIIBlockPredicateTypes;
 import com.aetherteam.aetherii.world.structure.AetherIIStructureTypes;
 import com.aetherteam.aetherii.world.structure.pool.AetherIIPoolElementTypes;
+import com.aetherteam.aetherii.world.structure.processor.AetherIIStructureProcessorTypes;
+import com.aetherteam.aetherii.world.surfacerule.AetherIISurfaceRules;
+import com.aetherteam.aetherii.world.tree.decorator.AetherIITreeDecoratorTypes;
+import com.aetherteam.aetherii.world.tree.foliage.AetherIIFoliagePlacerTypes;
+import com.aetherteam.aetherii.world.tree.trunk.AetherIITrunkPlacerTypes;
 import com.aetherteam.aetherii.world.surfacerule.AetherIISurfaceRules;
 import com.aetherteam.aetherii.world.tree.decorator.AetherIITreeDecoratorTypes;
 import com.aetherteam.aetherii.world.tree.foliage.AetherIIFoliagePlacerTypes;
@@ -67,6 +83,7 @@ import org.slf4j.Logger;
 public class AetherII {
     public static final String MODID = "aether_ii";
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final boolean DEBUG_MODE = false;
 
     public AetherII(ModContainer mod, IEventBus bus, Dist dist) {
         bus.addListener(AetherIIData::dataSetup);
@@ -76,6 +93,11 @@ public class AetherII {
         bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIBestiaryEntries.BESTIARY_ENTRY_REGISTRY_KEY, BestiaryEntry.DIRECT_CODEC, BestiaryEntry.DIRECT_CODEC));
         bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIEffectsEntries.EFFECTS_ENTRY_REGISTRY_KEY, EffectsEntry.DIRECT_CODEC, EffectsEntry.DIRECT_CODEC));
         bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIExplorationEntries.EXPLORATION_ENTRY_REGISTRY_KEY, ExplorationEntry.DIRECT_CODEC, ExplorationEntry.DIRECT_CODEC));
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIStyleDesigns.STYLE_DESIGN_REGISTRY_KEY, StyleDesign.DIRECT_CODEC, StyleDesign.DIRECT_CODEC));
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIStyleMaterials.STYLE_MATERIAL_REGISTRY_KEY, StyleMaterial.DIRECT_CODEC, StyleMaterial.DIRECT_CODEC));
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIISwetVariants.SWET_VARIANT_REGISTRY_KEY, SwetVariant.DIRECT_CODEC, SwetVariant.DIRECT_CODEC));
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIISkyrootLizardVariants.SKYROOT_LIZARD_VARIANT_REGISTRY_KEY, SkyrootLizardVariant.DIRECT_CODEC, SkyrootLizardVariant.DIRECT_CODEC));
+        bus.addListener(DataPackRegistryEvent.NewRegistry.class, event -> event.dataPackRegistry(AetherIIRewardWrappers.REWARD_WRAPPER_REGISTRY_KEY, RewardWrapper.DIRECT_CODEC, RewardWrapper.DIRECT_CODEC));
 
         DeferredRegister<?>[] registers = {
                 AetherIIFluidTypes.FLUID_TYPES,
@@ -86,8 +108,9 @@ public class AetherII {
                 AetherIIBlockEntityTypes.BLOCK_ENTITY_TYPES,
                 AetherIIAttributes.ATTRIBUTES,
                 AetherIIMemoryModuleTypes.MEMORY_MODULE_TYPES,
+                AetherIISensorTypes.SENSOR_TYPES,
                 AetherIIEffects.EFFECTS,
-                AetherIIArmorMaterials.ARMOR_MATERIALS,
+                AetherIIConsumeEffectTypes.CONSUME_EFFECT_TYPE,
                 AetherIIDataSerializers.ENTITY_DATA_SERIALIZERS,
                 AetherIIDataComponents.DATA_COMPONENT_TYPES,
                 AetherIIDataAttachments.ATTACHMENTS,
@@ -97,19 +120,24 @@ public class AetherII {
                 AetherIISoundEvents.SOUNDS,
                 AetherIIRecipeTypes.RECIPE_TYPES,
                 AetherIIRecipeSerializers.RECIPE_SERIALIZERS,
+                AetherIIRecipeDisplays.RECIPE_DISPLAYS,
+                AetherIIRecipeBookCategories.RECIPE_BOOK_CATEGORIES,
                 AetherIIGameEvents.GAME_EVENTS,
                 AetherIIPoi.POI,
                 AetherIIFeatures.FEATURES,
                 AetherIITreeDecoratorTypes.TREE_DECORATORS,
                 AetherIIFoliagePlacerTypes.FOLIAGE_PLACERS,
+                AetherIITrunkPlacerTypes.TRUNK_PLACERS,
                 AetherIIStructureTypes.STRUCTURE_TYPES,
+                AetherIIStructureProcessorTypes.STRUCTURE_PROCESSOR_TYPES,
                 AetherIIPoolElementTypes.POOL_ELEMENTS,
                 AetherIIDensityFunctionTypes.DENSITY_FUNCTION_TYPES,
                 AetherIILootFunctions.LOOT_FUNCTION_TYPES,
                 AetherIILootModifiers.GLOBAL_LOOT_MODIFIERS,
                 AetherIISurfaceRules.MATERIAL_RULES,
                 AetherIIBlockPredicateTypes.BLOCK_PREDICATE_TYPES,
-                AetherIIPlacementModifierTypes.PLACEMENT_MODIFIER_TYPES
+                AetherIIPlacementModifierTypes.PLACEMENT_MODIFIER_TYPES,
+                AetherIIEntitySubPredicates.ENTITY_SUB_PREDICATES
         };
 
         for (DeferredRegister<?> register : registers) {
@@ -136,13 +164,11 @@ public class AetherII {
             AetherIIBlocks.registerPots();
             AetherIIBlocks.registerFlammability();
 
-            AetherIIItems.registerAccessories();
-
+            AetherIIRecipePropertySets.addToMap();
+            
             this.registerDispenserBehaviors();
             this.registerCauldronInteractions();
         });
-
-        UniqueSlotHandling.EVENT.register(AetherIIAccessorySlots.INSTANCE);
     }
 
     public void eventSetup(IEventBus neoBus) {
@@ -164,41 +190,39 @@ public class AetherII {
         PayloadRegistrar registrar = event.registrar(MODID).versioned("1.0.0").optional();
 
         // CLIENTBOUND
-        registrar.playToClient(AcidDamageBlockPacket.TYPE, AcidDamageBlockPacket.STREAM_CODEC, AcidDamageBlockPacket::execute);
-        registrar.playToClient(AcidFizzPacket.TYPE, AcidFizzPacket.STREAM_CODEC, AcidFizzPacket::execute);
+        registrar.playToClient(AlkahestDamageBlockPacket.TYPE, AlkahestDamageBlockPacket.STREAM_CODEC, AlkahestDamageBlockPacket::execute);
+        registrar.playToClient(AlkahestFizzPacket.TYPE, AlkahestFizzPacket.STREAM_CODEC, AlkahestFizzPacket::execute);
         registrar.playToClient(ClientGrabItemPacket.TYPE, ClientGrabItemPacket.STREAM_CODEC, ClientGrabItemPacket::execute);
-        registrar.playToClient(EffectBuildupSetPacket.TYPE, EffectBuildupSetPacket.STREAM_CODEC, EffectBuildupSetPacket::execute);
-        registrar.playToClient(EffectBuildupRemovePacket.TYPE, EffectBuildupRemovePacket.STREAM_CODEC, EffectBuildupRemovePacket::execute);
+        registrar.playToClient(FlushGuidebookDataPacket.TYPE, FlushGuidebookDataPacket.STREAM_CODEC, FlushGuidebookDataPacket::execute);
         registrar.playToClient(ForgeSoundPacket.TYPE, ForgeSoundPacket.STREAM_CODEC, ForgeSoundPacket::execute);
-        registrar.playToClient(GasExplosionEffectsPacket.TYPE, GasExplosionEffectsPacket.STREAM_CODEC, GasExplosionEffectsPacket::execute);
+        registrar.playToClient(HestveilExplosionEffectsPacket.TYPE, HestveilExplosionEffectsPacket.STREAM_CODEC, HestveilExplosionEffectsPacket::execute);
         registrar.playToClient(GuidebookToastPacket.TYPE, GuidebookToastPacket.STREAM_CODEC, GuidebookToastPacket::execute);
         registrar.playToClient(DamageTypeParticlePacket.TYPE, DamageTypeParticlePacket.STREAM_CODEC, DamageTypeParticlePacket::execute);
         registrar.playToClient(PortalTravelSoundPacket.TYPE, PortalTravelSoundPacket.STREAM_CODEC, PortalTravelSoundPacket::execute);
         registrar.playToClient(RemountAerbunnyPacket.TYPE, RemountAerbunnyPacket.STREAM_CODEC, RemountAerbunnyPacket::execute);
-        registrar.playToClient(UpdateGuidebookDiscoveryPacket.TYPE, UpdateGuidebookDiscoveryPacket.STREAM_CODEC, UpdateGuidebookDiscoveryPacket::execute);
         registrar.playToClient(SetVehiclePacket.TYPE, SetVehiclePacket.STREAM_CODEC, SetVehiclePacket::execute);
         registrar.playToClient(SwetSyncPacket.TYPE, SwetSyncPacket.STREAM_CODEC, SwetSyncPacket::execute);
+        registrar.playToClient(GrassTintSyncPacket.TYPE, GrassTintSyncPacket.STREAM_CODEC, GrassTintSyncPacket::execute);
+        registrar.playToClient(UpdateGuidebookDiscoveryPacket.TYPE, UpdateGuidebookDiscoveryPacket.STREAM_CODEC, UpdateGuidebookDiscoveryPacket::execute);
 
         // SERVERBOUND
-        registrar.playToServer(AcidBreakBlockPacket.TYPE, AcidBreakBlockPacket.STREAM_CODEC, AcidBreakBlockPacket::execute);
+        registrar.playToServer(AlkahestBreakBlockPacket.TYPE, AlkahestBreakBlockPacket.STREAM_CODEC, AlkahestBreakBlockPacket::execute);
         registrar.playToServer(AerbunnyPuffPacket.TYPE, AerbunnyPuffPacket.STREAM_CODEC, AerbunnyPuffPacket::execute);
+        registrar.playToServer(CheckBestiaryEntryPacket.TYPE, CheckBestiaryEntryPacket.STREAM_CODEC, CheckBestiaryEntryPacket::execute);
+        registrar.playToServer(CheckEffectsEntryPacket.TYPE, CheckEffectsEntryPacket.STREAM_CODEC, CheckEffectsEntryPacket::execute);
+        registrar.playToServer(ClearAccessoriesPacket.TYPE, ClearAccessoriesPacket.STREAM_CODEC, ClearAccessoriesPacket::execute);
+        registrar.playToServer(MoaFlyModeChangePacket.TYPE, MoaFlyModeChangePacket.STREAM_CODEC, MoaFlyModeChangePacket::execute);
         registrar.playToServer(ForgeRenamePacket.TYPE, ForgeRenamePacket.STREAM_CODEC, ForgeRenamePacket::execute);
         registrar.playToServer(ForgeSlotCharmsPacket.TYPE, ForgeSlotCharmsPacket.STREAM_CODEC, ForgeSlotCharmsPacket::execute);
         registrar.playToServer(ForgeTriggerSoundPacket.TYPE, ForgeTriggerSoundPacket.STREAM_CODEC, ForgeTriggerSoundPacket::execute);
         registrar.playToServer(ForgeUpgradePacket.TYPE, ForgeUpgradePacket.STREAM_CODEC, ForgeUpgradePacket::execute);
-        registrar.playToServer(CheckGuidebookEntryPacket.TYPE, CheckGuidebookEntryPacket.STREAM_CODEC, CheckGuidebookEntryPacket::execute);
         registrar.playToServer(ClearItemPacket.TYPE, ClearItemPacket.STREAM_CODEC, ClearItemPacket::execute);
         registrar.playToServer(HeldCurrencyPacket.TYPE, HeldCurrencyPacket.STREAM_CODEC, HeldCurrencyPacket::execute);
         registrar.playToServer(OpenGuidebookPacket.TYPE, OpenGuidebookPacket.STREAM_CODEC, OpenGuidebookPacket::execute);
         registrar.playToServer(OpenInventoryPacket.TYPE, OpenInventoryPacket.STREAM_CODEC, OpenInventoryPacket::execute);
         registrar.playToServer(OutpostRespawnPacket.TYPE, OutpostRespawnPacket.STREAM_CODEC, OutpostRespawnPacket::execute);
         registrar.playToServer(StepHeightPacket.TYPE, StepHeightPacket.STREAM_CODEC, StepHeightPacket::execute);
-
-        // BOTH
-        registrar.playBidirectional(AetherIIPlayerSyncPacket.TYPE, AetherIIPlayerSyncPacket.STREAM_CODEC, AetherIIPlayerSyncPacket::execute);
-        registrar.playBidirectional(CurrencySyncPacket.TYPE, CurrencySyncPacket.STREAM_CODEC, CurrencySyncPacket::execute);
-        registrar.playBidirectional(DamageSystemSyncPacket.TYPE, DamageSystemSyncPacket.STREAM_CODEC, DamageSystemSyncPacket::execute);
-        registrar.playBidirectional(OutpostTrackerSyncPacket.TYPE, OutpostTrackerSyncPacket.STREAM_CODEC, OutpostTrackerSyncPacket::execute);
+        registrar.playToServer(CurrencyAmountPacket.TYPE, CurrencyAmountPacket.STREAM_CODEC, CurrencyAmountPacket::execute);
     }
 
     private void registerDispenserBehaviors() {
