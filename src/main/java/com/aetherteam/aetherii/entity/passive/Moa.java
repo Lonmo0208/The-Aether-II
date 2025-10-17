@@ -6,8 +6,10 @@ import com.aetherteam.aetherii.client.sound.AetherIISoundEvents;
 import com.aetherteam.aetherii.effect.AetherIIEffects;
 import com.aetherteam.aetherii.entity.AetherIIEntityTypes;
 import com.aetherteam.aetherii.entity.EntityUtil;
+import com.aetherteam.aetherii.entity.MountableMob;
 import com.aetherteam.aetherii.entity.ai.brain.MoaAi;
 import com.aetherteam.aetherii.entity.ai.navigator.FallPathNavigation;
+import com.aetherteam.aetherii.entity.attributes.AetherIIAttributes;
 import com.aetherteam.aetherii.inventory.menu.GuidebookEquipmentMenu;
 import com.aetherteam.aetherii.inventory.menu.provider.ExtraDataMenuProvider;
 import com.aetherteam.aetherii.item.AetherIIItems;
@@ -17,6 +19,8 @@ import com.aetherteam.aetherii.item.miscellaneous.MoaFeedItem;
 import com.aetherteam.aetherii.item.miscellaneous.MoaSaddlebagItem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
+
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
@@ -27,6 +31,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -49,6 +54,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.equipment.Equippable;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -63,30 +69,31 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Moa extends MountableAnimal implements ContainerListener, HasCustomInventoryScreen {
-    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_MOA_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
-    private static final EntityDataAccessor<String> DATA_FEATHER_SHAPE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<String> DATA_KERATIN_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<String> DATA_EYE_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<String> DATA_FEATHER_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
+public class Moa extends MountableAnimal implements ContainerListener, HasCustomInventoryScreen, OwnableEntity {
+    protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_MOA_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+    protected static final EntityDataAccessor<String> DATA_FEATHER_SHAPE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
+    protected static final EntityDataAccessor<String> DATA_KERATIN_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
+    protected static final EntityDataAccessor<String> DATA_EYE_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
+    protected static final EntityDataAccessor<String> DATA_FEATHER_COLOR = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.STRING);
 
-    private static final EntityDataAccessor<Boolean> DATA_HUNGRY = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> DATA_AMOUNT_FED = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_PLAYER_GROWN = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
+    protected static final EntityDataAccessor<Boolean> DATA_HUNGRY = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
+    protected static final EntityDataAccessor<Integer> DATA_AMOUNT_FED = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Boolean> DATA_PLAYER_GROWN = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
 
-    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_RIDER_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
-    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_LAST_RIDER_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
-    private static final EntityDataAccessor<Integer> DATA_REMAINING_JUMPS = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_FOLLOWING_ID = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+    protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_RIDER_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+    protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_LAST_RIDER_REFERENCE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
+    protected static final EntityDataAccessor<Integer> DATA_REMAINING_STAMINA = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Boolean> DATA_SITTING = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.BOOLEAN);
+    protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> DATA_FOLLOWING_ID = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
 
-    private static final EntityDataAccessor<ItemStack> DATA_SADDLE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<ItemStack> DATA_SADDLEBAG = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.ITEM_STACK);
+    protected static final EntityDataAccessor<ItemStack> DATA_SADDLE = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.ITEM_STACK);
+    protected static final EntityDataAccessor<ItemStack> DATA_SADDLEBAG = SynchedEntityData.defineId(Moa.class, EntityDataSerializers.ITEM_STACK);
 
     private SimpleContainer inventory;
 
     private int jumpCooldown;
     private int flapCooldown;
+    private int staminaHealCooldown;
 
     private float flap;
     private float flapO;
@@ -111,7 +118,10 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
                 .add(Attributes.STEP_HEIGHT, 1)
                 .add(Attributes.FOLLOW_RANGE, 6.0)
                 .add(Attributes.ATTACK_DAMAGE, 2.0)
-                .add(Attributes.ATTACK_KNOCKBACK, 2.0);
+                .add(Attributes.ATTACK_KNOCKBACK, 2.0)
+                .add(AetherIIAttributes.MOA_STRENGTH)
+                .add(AetherIIAttributes.MOA_STAMINA)
+                .add(AetherIIAttributes.MOA_SPEED);
     }
 
     /**
@@ -124,7 +134,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      * @return The {@link SpawnGroupData} to return.
      */
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @javax.annotation.Nullable SpawnGroupData spawnData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData) {
         this.generateMoaReference(); //todo: 1.21 tag passing into this method was removed.
 
         if (reason != EntitySpawnReason.NATURAL) {
@@ -157,7 +167,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         builder.define(DATA_FEATHER_COLOR, FeatherColor.LIGHT_BLUE.getSerializedName());
         builder.define(DATA_RIDER_REFERENCE, Optional.empty());
         builder.define(DATA_LAST_RIDER_REFERENCE, Optional.empty());
-        builder.define(DATA_REMAINING_JUMPS, 0);
+        builder.define(DATA_REMAINING_STAMINA, 0);
         builder.define(DATA_HUNGRY, false);
         builder.define(DATA_AMOUNT_FED, 0);
         builder.define(DATA_PLAYER_GROWN, false);
@@ -190,6 +200,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         return MoaAi.makeBrain(this, this.brainProvider().makeBrain(pDynamic));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Brain<Moa> getBrain() {
         return (Brain<Moa>) super.getBrain();
@@ -330,8 +341,13 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
                 }
             }
         }
-        if (this.onGround()) { // Reset jumps when the Moa is on the ground.
-            this.setRemainingJumps(this.getMaxJumps());
+        if (this.getRemainingStamina() < this.getMaxStamina()) {
+            if (this.getStaminaHealCooldown() > 0) {
+                this.setStaminaHealCooldown(this.getStaminaHealCooldown() - 1);
+            } else {
+                this.setRemainingStamina(this.getRemainingStamina() + 1);
+                this.setStaminaHealCooldown(300);
+            }
         }
         if (this.getJumpCooldown() > 0) { // Handles jump reset behavior.
             this.setJumpCooldown(this.getJumpCooldown() - 1);
@@ -434,6 +450,34 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         this.checkFallDistanceAccumulation(); // Resets the Moa's fall distance.
     }
 
+    @Override
+    protected boolean considersEntityAsAlly(Entity entity) {
+        if (this.isPlayerGrown()) {
+            LivingEntity rootOwner = this.getRootOwner();
+            if (entity == rootOwner) {
+                return true;
+            }
+
+            if (rootOwner != null) {
+                return rootOwner.isAlliedTo(entity);
+            }
+        }
+        return super.considersEntityAsAlly(entity);
+    }
+
+    public void die(DamageSource cause) {
+        Component deathMessage = this.getCombatTracker().getDeathMessage();
+        super.die(cause);
+        if (this.dead && this.level() instanceof ServerLevel serverlevel) {
+            if (serverlevel.getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES)) {
+                LivingEntity owner = this.getOwner();
+                if (owner instanceof ServerPlayer serverplayer) {
+                    serverplayer.sendSystemMessage(deathMessage);
+                }
+            }
+        }
+   }
+
     public float getFlyAmount(float pPartialTicks) {
         return Mth.lerp(pPartialTicks, this.flapO, this.flap);
     }
@@ -483,7 +527,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
     }
 
     /**
-     * Handles cooldowns, remaining jumps, and particles when jumping.
+     * Handles cooldowns, remaining stamina, and particles when jumping.
      *
      * @param mob The jumping {@link Mob}.
      */
@@ -492,7 +536,8 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         super.onJump(mob);
         this.setJumpCooldown(10);
         if (!this.onGround()) {
-            this.setRemainingJumps(this.getRemainingJumps() - 1);
+            this.setStaminaHealCooldown(300);
+            this.setRemainingStamina(this.getRemainingStamina() - 1);
             this.spawnExplosionParticle();
             if (this.getControllingPassenger() instanceof Player && this.isFallFlying()) {
                 Vec3 vec31 = this.getLookAngle();
@@ -686,7 +731,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
     /**
      * @return The {@link UUID} of the current rider of this Moa.
      */
-    @javax.annotation.Nullable
+    @Nullable
     public EntityReference<LivingEntity> getRider() {
         return this.getEntityData().get(DATA_RIDER_REFERENCE).orElse(null);
     }
@@ -696,14 +741,14 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      *
      * @param reference The {@link UUID}.
      */
-    public void setRider(@javax.annotation.Nullable EntityReference<LivingEntity> reference) {
+    public void setRider(@Nullable EntityReference<LivingEntity> reference) {
         this.getEntityData().set(DATA_RIDER_REFERENCE, Optional.ofNullable(reference));
     }
 
     /**
      * @return The {@link UUID} of the last rider of this Moa (including the current rider).
      */
-    @javax.annotation.Nullable
+    @Nullable
     public EntityReference<LivingEntity> getLastRider() {
         return this.getEntityData().get(DATA_LAST_RIDER_REFERENCE).orElse(null);
     }
@@ -713,24 +758,33 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      *
      * @param reference The {@link UUID}.
      */
-    public void setLastRider(@javax.annotation.Nullable EntityReference<LivingEntity> reference) {
+    public void setLastRider(@Nullable EntityReference<LivingEntity> reference) {
         this.getEntityData().set(DATA_LAST_RIDER_REFERENCE, Optional.ofNullable(reference));
     }
 
     /**
-     * @return The {@link Integer} value for the remaining jumps.
+     * Sets the last rider of this Moa (including the current rider).
+     *
+     * @param reference The {@link UUID}.
      */
-    public int getRemainingJumps() {
-        return this.getEntityData().get(DATA_REMAINING_JUMPS);
+    public void setLastRider(@Nullable LivingEntity lastRider) {
+        this.getEntityData().set(DATA_LAST_RIDER_REFERENCE, Optional.ofNullable(lastRider).map(EntityReference::new));
     }
 
     /**
-     * Sets the remaining jumps.
-     *
-     * @param remainingJumps The {@link Integer} value.
+     * @return The {@link Integer} value for the remaining stamina.
      */
-    public void setRemainingJumps(int remainingJumps) {
-        this.getEntityData().set(DATA_REMAINING_JUMPS, remainingJumps);
+    public int getRemainingStamina() {
+        return this.getEntityData().get(DATA_REMAINING_STAMINA);
+    }
+
+    /**
+     * Sets the remaining stamina.
+     *
+     * @param remainingStamina The {@link Integer} value.
+     */
+    public void setRemainingStamina(int remainingStamina) {
+        this.getEntityData().set(DATA_REMAINING_STAMINA, remainingStamina);
     }
 
     /**
@@ -800,7 +854,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
     /**
      * @return Whether this Moa is following the player, as a {@link Boolean}.
      */
-    @javax.annotation.Nullable
+    @Nullable
     public EntityReference<LivingEntity> getFollowing() {
         return this.getEntityData().get(DATA_FOLLOWING_ID).orElse(null);
     }
@@ -810,7 +864,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      *
      * @param reference The {@link Boolean} value.
      */
-    public void setFollowing(@javax.annotation.Nullable EntityReference<LivingEntity> reference) {
+    public void setFollowing(@Nullable EntityReference<LivingEntity> reference) {
         this.getEntityData().set(DATA_FOLLOWING_ID, Optional.ofNullable(reference));
     }
 
@@ -866,6 +920,22 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         this.flapCooldown = flapCooldown;
     }
 
+    /**
+     * @return The {@link Integer} value for how long until the Moa can heal stamina again.
+     */
+    public int getStaminaHealCooldown() {
+        return staminaHealCooldown;
+    }
+
+    /**
+     * Sets how long until the Moa can heal stamina again.
+     *
+     * @param staminaHealCooldown The {@link Integer} value.
+     */
+    public void setStaminaHealCooldown(int staminaHealCooldown) {
+        this.staminaHealCooldown = staminaHealCooldown;
+    }
+
     @Override
     protected SoundEvent getAmbientSound() {
         return AetherIISoundEvents.ENTITY_MOA_AMBIENT.get();
@@ -894,8 +964,8 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
     /**
      * @return The {@link Integer} for the maximum amount of jumps from the {@link MoaType}.
      */
-    public int getMaxJumps() {
-        return 3;
+    public int getMaxStamina() {
+        return this.getAttribute(AetherIIAttributes.MOA_STAMINA) != null ? (int) this.getAttribute(AetherIIAttributes.MOA_STAMINA).getValue() : 3;
     }
 
     /**
@@ -903,6 +973,26 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      */
     public int getEggTime() {
         return this.random.nextInt(6000) + 6000;
+    }
+
+    @Nullable
+    public EntityReference<LivingEntity> getOwnerReference() {
+        return this.getEntityData().get(DATA_RIDER_REFERENCE).orElseGet(this::getLastRider);
+    }
+
+    public void setOwner(@Nullable LivingEntity owner) {
+        setLastRider(owner);
+    }
+
+    public void setOwnerReference(@Nullable EntityReference<LivingEntity> owner) {
+        setLastRider(owner);
+    }
+
+    public void tame(Player player) {
+        this.setOwner(player);
+        if (player instanceof ServerPlayer serverplayer) {
+            CriteriaTriggers.TAME_ANIMAL.trigger(serverplayer, this);
+        }
     }
 
     @Override
@@ -933,12 +1023,17 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         }
     }
 
+    @Override
+    public boolean canSprint() {
+        return true;
+    }
+
     /**
-     * @return A {@link Boolean} for whether the Moa can jump, determined by remaining jumps and jump cooldown.
+     * @return A {@link Boolean} for whether the Moa can jump, determined by remaining stamina and jump cooldown.
      */
     @Override
     public boolean canJump() {
-        return this.getRemainingJumps() > 0 && this.getJumpCooldown() == 0;
+        return this.getRemainingStamina() > 0 && this.getJumpCooldown() == 0;
     }
 
     public void equipSaddle(ItemStack stack) {
@@ -963,15 +1058,19 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
      */
     @Override
     public double getMountJumpStrength() {
-        return this.onGround() ? 0.95 : 0.90;
+        float f = (float) (this.getAttributeValue(AetherIIAttributes.MOA_STRENGTH) * 0.01F);
+        return this.onGround() ? 0.95 + f : 0.90 + f;
     }
 
     /**
-     * @return The {@link Float} for the steering speed from the {@link MoaType}.
+     * @return The {@link Float} for the steering speed.
      */
     @Override
     public float getSteeringSpeed() {
-        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.35F;
+        Entity entity = this.getControllingPassenger();
+        float f = entity != null && entity.isSprinting() ? (float) (this.getAttributeValue(AetherIIAttributes.MOA_SPEED) * 0.1F) : 0;
+
+        return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.35F + f;
     }
 
     @Override
@@ -990,7 +1089,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
     @Override
     public float getFlyingSpeed() {
         if (this.isVehicle() && this.isSaddled()) {
-            return this.getSteeringSpeed() * 0.45F;
+            return this.getSteeringSpeed() * 0.35F;
         } else {
             return this.getSteeringSpeed() * 0.025F;
         }
@@ -1040,7 +1139,7 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         return dimensions;
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob entity) {
         return null;
@@ -1099,7 +1198,8 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         if (this.getLastRider() != null) {
             output.store("LastRider", EntityReference.codec(), this.getLastRider());
         }
-        output.putInt("RemainingJumps", this.getRemainingJumps());
+        output.putInt("StaminaHealCooldown", this.getStaminaHealCooldown());
+        output.putInt("RemainingStamina", this.getRemainingStamina());
         output.putBoolean("Hungry", this.isHungry());
         output.putInt("AmountFed", this.getAmountFed());
         output.putBoolean("PlayerGrown", this.isPlayerGrown());
@@ -1130,12 +1230,13 @@ public class Moa extends MountableAnimal implements ContainerListener, HasCustom
         input.read("MoaUUID", EntityReference.<LivingEntity>codec()).ifPresent(this::setMoaReference);
         this.setBaby(input.getBooleanOr("IsBaby", false));
         input.getString("FeatherShape").filter((string) -> Arrays.stream(FeatherShape.values()).map(FeatherShape::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setFeatherShape);
-        input.getString("KeratinColor").filter((string) -> Arrays.stream(KeratinColor.values()).map(KeratinColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setFeatherShape);
-        input.getString("EyeColor").filter((string) -> Arrays.stream(EyeColor.values()).map(EyeColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setFeatherShape);
-        input.getString("FeatherColor").filter((string) -> Arrays.stream(FeatherColor.values()).map(FeatherColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setFeatherShape);
+        input.getString("KeratinColor").filter((string) -> Arrays.stream(KeratinColor.values()).map(KeratinColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setKeratinColor);
+        input.getString("EyeColor").filter((string) -> Arrays.stream(EyeColor.values()).map(EyeColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setEyeColor);
+        input.getString("FeatherColor").filter((string) -> Arrays.stream(FeatherColor.values()).map(FeatherColor::getSerializedName).anyMatch((s) -> s.equals(string))).ifPresent(this::setFeatherColor);
         input.read("Rider", EntityReference.<LivingEntity>codec()).ifPresent(this::setRider);
         input.read("LastRider", EntityReference.<LivingEntity>codec()).ifPresent(this::setLastRider);
-        input.getInt("RemainingJumps").ifPresent(this::setRemainingJumps);
+        input.getInt("StaminaHealCooldown").ifPresent(this::setStaminaHealCooldown);
+        input.getInt("RemainingStamina").ifPresent(this::setRemainingStamina);
         this.setHungry(input.getBooleanOr("Hungry", false));
         input.getInt("AmountFed").ifPresent(this::setAmountFed);
         this.setPlayerGrown(input.getBooleanOr("PlayerGrown", false));
