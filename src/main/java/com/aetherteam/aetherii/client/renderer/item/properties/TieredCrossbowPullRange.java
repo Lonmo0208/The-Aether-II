@@ -4,7 +4,7 @@ import com.aetherteam.aetherii.item.equipment.weapons.TieredCrossbowItem;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperty;
-import net.minecraft.client.renderer.item.properties.numeric.UseDuration;
+
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -21,8 +21,8 @@ public class TieredCrossbowPullRange implements RangeSelectItemModelProperty {
         } else if (TieredCrossbowItem.isCharged(itemStack)) {
             return 0.0F;
         } else {
-            int charge = TieredCrossbowItem.getChargeDuration(itemStack, livingEntity);
-            return (float) UseDuration.useDuration(itemStack, livingEntity) / (float) charge;
+            int charge = ((TieredCrossbowItem) itemStack.getItem()).getCrossbowChargeDuration(itemStack, livingEntity);
+            return (float) livingEntity.getUseItemRemainingTicks() / (float) charge;
         }
     }
 

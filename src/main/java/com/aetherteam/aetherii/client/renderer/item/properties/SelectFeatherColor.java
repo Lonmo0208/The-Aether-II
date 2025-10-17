@@ -26,7 +26,6 @@ public class SelectFeatherColor implements SelectItemModelProperty<Moa.FeatherCo
         return TYPE;
     }
 
-    @Override
     public Codec<Moa.FeatherColor> valueCodec() {
         return Moa.FeatherColor.CODEC;
     }

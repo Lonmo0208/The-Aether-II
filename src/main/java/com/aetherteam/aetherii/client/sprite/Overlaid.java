@@ -69,8 +69,8 @@ public class Overlaid implements SpriteSource {
 
                 for (int i = 0; i < nativeImage.getHeight(); i++) {
                     for (int j = 0; j < nativeImage.getWidth(); j++) {
-                        int color = nativeOverlayImage.getLuminanceOrAlpha(i, j) != 0 ? nativeOverlayImage.getPixel(i, j) : nativeBaseImage.getPixel(i, j);
-                        nativeImage.setPixel(i, j, color);
+                        int color = nativeOverlayImage.getLuminanceOrAlpha(j, i) != 0 ? nativeOverlayImage.getPixelRGBA(j, i) : nativeBaseImage.getPixelRGBA(j, i);
+                        nativeImage.setPixelRGBA(j, i, color);
                     }
                 }
                 return new SpriteContents(this.outputLocation(), new FrameSize(nativeImage.getWidth(), nativeImage.getHeight()), nativeImage, ResourceMetadata.EMPTY);

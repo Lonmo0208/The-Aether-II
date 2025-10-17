@@ -1,5 +1,6 @@
 package com.aetherteam.aetherii.block.dungeon;
 
+import com.aetherteam.aetherii.AetherII;
 import com.aetherteam.aetherii.block.AetherIIBlocks;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -12,11 +13,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.MossyCarpetBlock;
-import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -26,17 +28,18 @@ import net.minecraft.world.level.block.state.properties.WallSide;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
-public class FungalCarpetBlock extends MossyCarpetBlock {
-    public static final MapCodec<FungalCarpetBlock> CODEC = simpleCodec(FungalCarpetBlock::new);
+public class FungalCarpetBlock extends Block {
+    public static final MapCodec<FungalCarpetBlock> CODEC = Block.simpleCodec(FungalCarpetBlock::new);
     public static final BooleanProperty BASE = BlockStateProperties.BOTTOM;
     private static final EnumProperty<WallSide> NORTH = BlockStateProperties.NORTH_WALL;
     private static final EnumProperty<WallSide> EAST = BlockStateProperties.EAST_WALL;
     private static final EnumProperty<WallSide> SOUTH = BlockStateProperties.SOUTH_WALL;
     private static final EnumProperty<WallSide> WEST = BlockStateProperties.WEST_WALL;
-    private static final ImmutableMap PROPERTY_BY_DIRECTION = ImmutableMap.copyOf(Util.make(Maps.newEnumMap(Direction.class), (map) -> {
+    private static final Map<Direction, EnumProperty<WallSide>> PROPERTY_BY_DIRECTION = ImmutableMap.copyOf(Util.make(Maps.newEnumMap(Direction.class), (map) -> {
         map.put(Direction.NORTH, NORTH);
         map.put(Direction.EAST, EAST);
         map.put(Direction.SOUTH, SOUTH);
@@ -45,7 +48,7 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
 
     public FungalCarpetBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(BASE, true).setValue(NORTH, WallSide.NONE).setValue(EAST, WallSide.NONE).setValue(SOUTH, WallSide.NONE).setValue(WEST, WallSide.NONE));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(BASE, true).setValue(NORTH, WallSide.NONE).setValue(EAST, WallSide.NONE).setValue(SOUTH, WallSide.NONE).setValue(WEST, WallSide.NONE));
     }
 
     private static BlockState getUpdatedState(BlockState state, BlockGetter blockGetter, BlockPos pos, boolean base) {
@@ -64,16 +67,16 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
                     stateAbove = blockGetter.getBlockState(pos.above());
                 }
 
-                if (stateAbove.is(AetherIIBlocks.FUNGAL_CARPET) && stateAbove.getValue(wallProperty) != WallSide.NONE && !(Boolean)stateAbove.getValue(BASE)) {
+                if (stateAbove.getBlock() == AetherIIBlocks.FUNGAL_CARPET.get() && stateAbove.getValue(wallProperty) != WallSide.NONE && !stateAbove.getValue(BASE)) {
                     wallSide = WallSide.TALL;
                 }
 
-                if (!(Boolean)state.getValue(BASE)) {
+                if (!state.getValue(BASE)) {
                     if (stateBelow == null) {
                         stateBelow = blockGetter.getBlockState(pos.below());
                     }
 
-                    if (stateBelow.is(AetherIIBlocks.FUNGAL_CARPET) && stateBelow.getValue(wallProperty) == WallSide.NONE) {
+                    if (stateBelow.getBlock() == AetherIIBlocks.FUNGAL_CARPET.get() && stateBelow.getValue(wallProperty) == WallSide.NONE) {
                         wallSide = WallSide.NONE;
                     }
                 }
@@ -86,6 +89,11 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return getUpdatedState(this.defaultBlockState(), context.getLevel(), context.getClickedPos(), true);
+    }
+    
+    @Override
+    protected MapCodec<? extends Block> codec() {
+        return CODEC;
     }
 
     public static void placeAt(LevelAccessor level, BlockPos pos, RandomSource random, int flags) {
@@ -114,8 +122,8 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
     private static BlockState createTopperWithSideChance(BlockGetter blockGetter, BlockPos pos, BooleanSupplier booleanSupplier) {
         BlockPos posAbove = pos.above();
         BlockState stateAbove = blockGetter.getBlockState(posAbove);
-        boolean flag = stateAbove.is(AetherIIBlocks.FUNGAL_CARPET.get());
-        if ((!flag || !(Boolean)stateAbove.getValue(BASE)) && (flag || stateAbove.canBeReplaced())) {
+        boolean flag = stateAbove.getBlock() == AetherIIBlocks.FUNGAL_CARPET.get();
+        if ((!flag || !stateAbove.getValue(BASE)) && (flag || stateAbove.canBeReplaced())) {
             BlockState state = AetherIIBlocks.FUNGAL_CARPET.get().defaultBlockState().setValue(BASE, false);
             BlockState stateUpdated = getUpdatedState(state, blockGetter, pos.above(), true);
 
@@ -133,7 +141,7 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+    protected BlockState updateShape(BlockState state, LevelReader level, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
         if (!state.canSurvive(level, pos)) {
             return Blocks.AIR.defaultBlockState();
         } else {
@@ -160,9 +168,13 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
     }
 
     private static boolean canSupportAtFace(BlockGetter blockGetter, BlockPos pos, Direction direction) {
-        return direction != Direction.UP && MultifaceBlock.canAttachTo(blockGetter, pos, direction);
+        if (direction == Direction.UP) return false;
+        BlockPos neighborPos = pos.relative(direction);
+        BlockState neighborState = blockGetter.getBlockState(neighborPos);
+        return neighborState.isFaceSturdy(blockGetter, neighborPos, direction.getOpposite());
     }
 
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BASE, NORTH, EAST, SOUTH, WEST);
     }
@@ -173,5 +185,9 @@ public class FungalCarpetBlock extends MossyCarpetBlock {
         if (!stateTop.isAir()) {
             level.setBlock(pos.above(), stateTop, 3);
         }
+    }
+    
+    private static EnumProperty<WallSide> getPropertyForFace(Direction direction) {
+        return PROPERTY_BY_DIRECTION.get(direction);
     }
 }

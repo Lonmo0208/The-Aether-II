@@ -123,7 +123,9 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
         );
         this.tag(AetherIITags.Blocks.AMBEROOT_LOGS).add(
                 AetherIIBlocks.AMBEROOT_LOG.get(),
-                AetherIIBlocks.AMBEROOT_WOOD.get()
+                AetherIIBlocks.AMBEROOT_WOOD.get(),
+                AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get(),
+                AetherIIBlocks.STRIPPED_AMBEROOT_WOOD.get()
         );
         this.tag(AetherIITags.Blocks.SKYROOT_DECORATIVE_BLOCKS).add(
                 AetherIIBlocks.SKYROOT_FLOORBOARDS.get(),
@@ -544,27 +546,33 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.GREATROOT_SIGN.get(),
                 AetherIIBlocks.GREATROOT_WALL_SIGN.get(),
                 AetherIIBlocks.WISPROOT_SIGN.get(),
-                AetherIIBlocks.WISPROOT_WALL_SIGN.get()
+                AetherIIBlocks.WISPROOT_WALL_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_WALL_SIGN.get()
         );
         this.tag(BlockTags.STANDING_SIGNS).add(
                 AetherIIBlocks.SKYROOT_SIGN.get(),
                 AetherIIBlocks.GREATROOT_SIGN.get(),
-                AetherIIBlocks.WISPROOT_SIGN.get()
+                AetherIIBlocks.WISPROOT_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_SIGN.get()
         );
         this.tag(BlockTags.WALL_SIGNS).add(
                 AetherIIBlocks.SKYROOT_WALL_SIGN.get(),
                 AetherIIBlocks.GREATROOT_WALL_SIGN.get(),
-                AetherIIBlocks.WISPROOT_WALL_SIGN.get()
+                AetherIIBlocks.WISPROOT_WALL_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_WALL_SIGN.get()
         );
         this.tag(BlockTags.CEILING_HANGING_SIGNS).add(
                 AetherIIBlocks.SKYROOT_HANGING_SIGN.get(),
                 AetherIIBlocks.GREATROOT_HANGING_SIGN.get(),
-                AetherIIBlocks.WISPROOT_HANGING_SIGN.get()
+                AetherIIBlocks.WISPROOT_HANGING_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_HANGING_SIGN.get()
         );
         this.tag(BlockTags.WALL_HANGING_SIGNS).add(
                 AetherIIBlocks.SKYROOT_WALL_HANGING_SIGN.get(),
                 AetherIIBlocks.GREATROOT_WALL_HANGING_SIGN.get(),
-                AetherIIBlocks.WISPROOT_WALL_HANGING_SIGN.get()
+                AetherIIBlocks.WISPROOT_WALL_HANGING_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_WALL_HANGING_SIGN.get()
         );
         this.tag(BlockTags.PORTALS).add(AetherIIBlocks.AETHER_PORTAL.get());
         this.tag(BlockTags.BEACON_BASE_BLOCKS).add(
@@ -726,11 +734,13 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.WISPROOT_LOG.get(),
                 AetherIIBlocks.MOSSY_WISPROOT_LOG.get(),
                 AetherIIBlocks.AMBEROOT_LOG.get(),
+                AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get(),
                 AetherIIBlocks.SKYROOT_WOOD.get(),
                 AetherIIBlocks.STRIPPED_SKYROOT_WOOD.get(),
                 AetherIIBlocks.GREATROOT_WOOD.get(),
                 AetherIIBlocks.WISPROOT_WOOD.get(),
                 AetherIIBlocks.AMBEROOT_WOOD.get(),
+                AetherIIBlocks.STRIPPED_AMBEROOT_WOOD.get(),
                 AetherIIBlocks.BLUEBERRY_BUSH_STEM.get(),
                 AetherIIBlocks.ORANGE_TREE.get(),
                 AetherIIBlocks.SKYROOT_PLANKS.get(),
@@ -808,7 +818,11 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.WISPROOT_SIGN.get(),
                 AetherIIBlocks.WISPROOT_WALL_SIGN.get(),
                 AetherIIBlocks.WISPROOT_HANGING_SIGN.get(),
-                AetherIIBlocks.WISPROOT_WALL_HANGING_SIGN.get()
+                AetherIIBlocks.WISPROOT_WALL_HANGING_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_WALL_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_HANGING_SIGN.get(),
+                AetherIIBlocks.AMBEROOT_WALL_HANGING_SIGN.get()
         );
         this.tag(BlockTags.MINEABLE_WITH_SHOVEL).add(
                 AetherIIBlocks.AETHER_GRASS_BLOCK.get(),

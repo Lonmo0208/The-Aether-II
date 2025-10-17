@@ -16,7 +16,10 @@ public record SheepuffPredicate(Optional<Boolean> puffed, Optional<Boolean> shea
     public static final MapCodec<SheepuffPredicate> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             Codec.BOOL.optionalFieldOf("puffed").forGetter(SheepuffPredicate::puffed),
             Codec.BOOL.optionalFieldOf("sheared").forGetter(SheepuffPredicate::sheared),
-            Sheepuff.SheepuffColor.CODEC.optionalFieldOf("color").forGetter(SheepuffPredicate::color)
+            Codec.STRING.xmap(
+                str -> Sheepuff.SheepuffColor.valueOf(str.toUpperCase()),
+                Enum::name
+            ).optionalFieldOf("color").forGetter(SheepuffPredicate::color)
     ).apply(instance, SheepuffPredicate::new));
 
     @Override

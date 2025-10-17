@@ -15,7 +15,7 @@ import java.util.Optional;
 public record KirridPredicate(Optional<Boolean> sheared, Optional<Kirrid.KirridColor> color) implements EntitySubPredicate {
     public static final MapCodec<KirridPredicate> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             Codec.BOOL.optionalFieldOf("sheared").forGetter(KirridPredicate::sheared),
-            Kirrid.KirridColor.CODEC.optionalFieldOf("color").forGetter(KirridPredicate::color)
+            Codec.STRING.xmap(Kirrid.KirridColor::valueOf, Enum::name).optionalFieldOf("color").forGetter(KirridPredicate::color)
     ).apply(instance, KirridPredicate::new));
 
     @Override

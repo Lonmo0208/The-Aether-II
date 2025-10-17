@@ -28,7 +28,7 @@ public class AetherIIShearingLoot implements LootTableSubProvider {
 
     @Override
     public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> builder) {
-        Kirrid.KirridColor.CLOUDWOOL_BY_KIRRID_COLOR.forEach((color, wool) -> {
+        Kirrid.KirridColor.getCloudwoolByColor().forEach((color, wool) -> {
             builder.accept(AetherIILoot.SHEARING_HIGHFIELDS_KIRRID_WOOL_BY_DYE.get(color), LootTable.lootTable().withPool(LootPool.lootPool().setRolls(UniformGenerator.between(1.0F, 3.0F)).add(LootItem.lootTableItem(wool))));
             builder.accept(AetherIILoot.SHEARING_MAGNETIC_KIRRID_WOOL_BY_DYE.get(color), LootTable.lootTable().withPool(LootPool.lootPool().setRolls(UniformGenerator.between(1.0F, 3.0F)).add(LootItem.lootTableItem(wool))));
             builder.accept(AetherIILoot.SHEARING_ARCTIC_KIRRID_WOOL_BY_DYE.get(color), LootTable.lootTable().withPool(LootPool.lootPool().setRolls(UniformGenerator.between(1.0F, 3.0F)).add(LootItem.lootTableItem(wool))));

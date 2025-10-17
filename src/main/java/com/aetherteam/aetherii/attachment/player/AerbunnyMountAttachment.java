@@ -6,20 +6,14 @@ import com.aetherteam.aetherii.entity.passive.Aerbunny;
 import com.aetherteam.aetherii.network.packet.clientbound.RemountAerbunnyPacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class AerbunnyMountAttachment implements ValueIOSerializable {
+public class AerbunnyMountAttachment {
     @Nullable
     private Aerbunny mountedAerbunny;
     private Optional<CompoundTag> mountedAerbunnyTag = Optional.empty();
@@ -38,17 +32,16 @@ public class AerbunnyMountAttachment implements ValueIOSerializable {
      */
     public void removeAerbunny() {
         if (this.getMountedAerbunny() != null) {
-            try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(
-                    this.getMountedAerbunny().problemPath(), AetherII.LOGGER
-            )) {
-                TagValueOutput valueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, this.mountedAerbunny.registryAccess());
+            try {
+                CompoundTag tag = new CompoundTag();
                 Aerbunny aerbunny = this.getMountedAerbunny();
-                aerbunny.saveAsPassenger(valueoutput);
-                this.setMountedAerbunnyTag(Optional.of(valueoutput.buildResult()));
+                aerbunny.save(tag);
+                this.setMountedAerbunnyTag(Optional.of(tag));
                 aerbunny.stopRiding();
                 aerbunny.setRemoved(Entity.RemovalReason.UNLOADED_WITH_PLAYER);
+            } catch (Exception e) {
+                AetherII.LOGGER.error("Failed to save Aerbunny data: {}", e.getMessage());
             }
-
         }
     }
 
@@ -58,19 +51,18 @@ public class AerbunnyMountAttachment implements ValueIOSerializable {
     public void remountAerbunny(Player player) {
         if (this.getMountedAerbunnyTag().isPresent()) {
             if (!player.level().isClientSide()) {
-                try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(
-                        player.problemPath(), AetherII.LOGGER
-                )) {
-
+                try {
                     Aerbunny aerbunny = new Aerbunny(AetherIIEntityTypes.AERBUNNY.get(), player.level());
-                    ValueInput valueInput = TagValueInput.create(problemreporter$scopedcollector, player.registryAccess(), this.getMountedAerbunnyTag().get());
-                    aerbunny.load(valueInput);
+                    aerbunny.load(this.getMountedAerbunnyTag().get());
+                    aerbunny.setPos(player.getX(), player.getY(), player.getZ());
                     player.level().addFreshEntity(aerbunny);
                     aerbunny.startRiding(player);
                     this.setMountedAerbunny(aerbunny);
                     if (player instanceof ServerPlayer serverPlayer) {
                         PacketDistributor.sendToPlayer(serverPlayer, new RemountAerbunnyPacket(player.getId(), aerbunny.getId()));
                     }
+                } catch (Exception e) {
+                    AetherII.LOGGER.error("Failed to load Aerbunny data: {}", e.getMessage());
                 }
             }
             this.setMountedAerbunnyTag(Optional.empty());
@@ -109,15 +101,23 @@ public class AerbunnyMountAttachment implements ValueIOSerializable {
         return this.mountedAerbunnyTag;
     }
 
-    @Override
-    public void serialize(ValueOutput valueOutput) {
+    /**
+     * Serializes the attachment data to NBT
+     */
+    public void save(CompoundTag tag) {
         if (this.mountedAerbunnyTag.isPresent()) {
-            valueOutput.store("mounted_aerbunny", CompoundTag.CODEC, this.mountedAerbunnyTag.get());
+            tag.put("mounted_aerbunny", this.mountedAerbunnyTag.get());
         }
     }
 
-    @Override
-    public void deserialize(ValueInput valueInput) {
-        this.mountedAerbunnyTag = valueInput.read("mounted_aerbunny", CompoundTag.CODEC);
+    /**
+     * Deserializes the attachment data from NBT
+     */
+    public void load(CompoundTag tag) {
+        if (tag.contains("mounted_aerbunny")) {
+            this.mountedAerbunnyTag = Optional.of(tag.getCompound("mounted_aerbunny"));
+        } else {
+            this.mountedAerbunnyTag = Optional.empty();
+        }
     }
 }

@@ -27,7 +27,6 @@ public class SelectMoaEggType implements SelectItemModelProperty<MoaEggType> {
         return TYPE;
     }
 
-    @Override
     public Codec<MoaEggType> valueCodec() {
         return MoaEggType.CODEC;
     }

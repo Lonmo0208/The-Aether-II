@@ -7,8 +7,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import net.minecraft.world.item.DyeColor;
 
 public class AetherIILoot {
     private static final Set<ResourceKey<LootTable>> LOOT_TABLES = new HashSet<>();
@@ -96,6 +99,25 @@ public class AetherIILoot {
     // Stripping
     public static final ResourceKey<LootTable> STRIP_MOSSY_WISPROOT = register("stripping/strip_mossy_wisproot");
     public static final ResourceKey<LootTable> STRIP_AMBEROOT = register("stripping/strip_amberoot");
+    
+    // Shearing
+    public static final Map<DyeColor, ResourceKey<LootTable>> SHEARING_HIGHFIELDS_KIRRID_WOOL_BY_DYE = createColorMap("shearing/highfields_kirrid/wool_by_dye");
+    public static final Map<DyeColor, ResourceKey<LootTable>> SHEARING_MAGNETIC_KIRRID_WOOL_BY_DYE = createColorMap("shearing/magnetic_kirrid/wool_by_dye");
+    public static final Map<DyeColor, ResourceKey<LootTable>> SHEARING_ARCTIC_KIRRID_WOOL_BY_DYE = createColorMap("shearing/arctic_kirrid/wool_by_dye");
+    
+    public static final ResourceKey<LootTable> SHEARING_HIGHFIELDS_KIRRID_WOOL_UNDYED = register("shearing/highfields_kirrid/wool_undyed");
+    public static final ResourceKey<LootTable> SHEARING_MAGNETIC_KIRRID_WOOL_UNDYED = register("shearing/magnetic_kirrid/wool_undyed");
+    public static final ResourceKey<LootTable> SHEARING_ARCTIC_KIRRID_WOOL_UNDYED = register("shearing/arctic_kirrid/wool_undyed");
+    
+    public static final ResourceKey<LootTable> SHEARING_HIGHFIELDS_KIRRID = register("shearing/highfields_kirrid");
+    public static final ResourceKey<LootTable> SHEARING_MAGNETIC_KIRRID = register("shearing/magnetic_kirrid");
+    public static final ResourceKey<LootTable> SHEARING_ARCTIC_KIRRID = register("shearing/arctic_kirrid");
+    
+    public static final Map<DyeColor, ResourceKey<LootTable>> SHEARING_SHEEPUFF_WOOL_BY_DYE = createColorMap("shearing/sheepuff/wool_by_dye");
+    public static final ResourceKey<LootTable> SHEARING_SHEEPUFF = register("shearing/sheepuff");
+    
+    // Gifts
+    public static final ResourceKey<LootTable> TAEGORE_DIGGING = register("gifts/taegore_digging");
 
     private static ResourceKey<LootTable> register(String id) {
         return register(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.fromNamespaceAndPath(AetherII.MODID, id)));
@@ -107,5 +129,13 @@ public class AetherIILoot {
         } else {
             throw new IllegalArgumentException(id + " is already a registered built-in loot table");
         }
+    }
+    
+    private static Map<DyeColor, ResourceKey<LootTable>> createColorMap(String prefix) {
+        Map<DyeColor, ResourceKey<LootTable>> map = new HashMap<>();
+        for (DyeColor color : DyeColor.values()) {
+            map.put(color, register(prefix + "/" + color.getName()));
+        }
+        return Collections.unmodifiableMap(map);
     }
 }

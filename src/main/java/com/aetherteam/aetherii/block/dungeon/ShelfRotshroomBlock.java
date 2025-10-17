@@ -7,7 +7,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.ScheduledTickAccess;
+
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -49,11 +49,11 @@ public class ShelfRotshroomBlock extends BushBlock {
         return this.canAttachTo(level, pos.relative(direction.getOpposite()), direction);
     }
 
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTick, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+    protected BlockState updateShape(BlockState state, LevelReader level, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState) {
         if (direction.getOpposite() == state.getValue(FACING) && !state.canSurvive(level, pos)) {
             return Blocks.AIR.defaultBlockState();
         }
-        return super.updateShape(state, level, scheduledTick, pos, direction, neighborPos, neighborState, random);
+        return super.updateShape(state, level, pos, direction, neighborPos, neighborState);
     }
 
     @Nullable
@@ -94,6 +94,11 @@ public class ShelfRotshroomBlock extends BushBlock {
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    @Override
+    public MapCodec<ShelfRotshroomBlock> codec() {
+        return CODEC;
     }
 
     static {

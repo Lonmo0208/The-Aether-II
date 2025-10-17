@@ -214,7 +214,7 @@ public class ShroudedCanopyDecorator extends TreeDecorator {
     }
 
     private boolean isValidBranchPos(Context context, BlockPos pos) {
-        return context.isAir(pos) || context.checkBlock(pos, state -> state.is(BlockTags.LEAVES));
+        return context.isAir(pos) || context.level().isStateAtPosition(pos, state -> state.is(BlockTags.LEAVES));
     }
 
     private void createVines(Context context, BlockPos pos) {
@@ -241,7 +241,8 @@ public class ShroudedCanopyDecorator extends TreeDecorator {
 
     @Override
     protected TreeDecoratorType<?> type() {
-        return AetherIITreeDecoratorTypes.SHROUDED_CANOPY.get();
+        // Temporarily return MOSS type until SHROUDED_CANOPY is registered
+        return AetherIITreeDecoratorTypes.MOSS.get();
     }
 
     private record Coordinate(int x, int z) { }

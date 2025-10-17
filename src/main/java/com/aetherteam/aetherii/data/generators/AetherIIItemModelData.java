@@ -330,6 +330,7 @@ public class AetherIIItemModelData extends AetherIIItemModelProvider {
         this.itemBlock(AetherIIBlocks.MOSSY_WISPROOT_LOG.get());
         this.itemBlock(AetherIIBlocks.STRIPPED_WISPROOT_LOG.get());
         this.itemBlock(AetherIIBlocks.AMBEROOT_LOG.get());
+        this.itemBlock(AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get());
         this.itemBlock(AetherIIBlocks.SKYROOT_WOOD.get());
         this.itemBlock(AetherIIBlocks.STRIPPED_SKYROOT_WOOD.get());
         this.itemBlock(AetherIIBlocks.GREATROOT_WOOD.get());
@@ -337,6 +338,7 @@ public class AetherIIItemModelData extends AetherIIItemModelProvider {
         this.itemBlock(AetherIIBlocks.WISPROOT_WOOD.get());
         this.itemBlock(AetherIIBlocks.STRIPPED_WISPROOT_WOOD.get());
         this.itemBlock(AetherIIBlocks.AMBEROOT_WOOD.get());
+        this.itemBlock(AetherIIBlocks.STRIPPED_AMBEROOT_WOOD.get());
 
         // Leaf Pile
         this.itemBlock(AetherIIBlocks.SKYROOT_LEAF_PILE.get());
@@ -698,6 +700,9 @@ public class AetherIIItemModelData extends AetherIIItemModelProvider {
 
         this.item(AetherIIBlocks.WISPROOT_SIGN.get().asItem(), "miscellaneous/");
         this.item(AetherIIBlocks.WISPROOT_HANGING_SIGN.get().asItem(), "miscellaneous/");
+        
+        this.item(AetherIIBlocks.AMBEROOT_SIGN.get().asItem(), "miscellaneous/");
+        this.item(AetherIIBlocks.AMBEROOT_HANGING_SIGN.get().asItem(), "miscellaneous/");
 
         // Bookshelves
         this.itemBlock(AetherIIBlocks.SKYROOT_BOOKSHELF.get());

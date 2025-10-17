@@ -110,6 +110,7 @@ public class AetherIIBlockStateData extends AetherIIBlockStateProvider {
         this.log(AetherIIBlocks.STRIPPED_WISPROOT_LOG.get());
         this.mossyWisprootLog(AetherIIBlocks.MOSSY_WISPROOT_LOG.get(), AetherIIBlocks.WISPROOT_LOG.get());
         this.logDifferentTop(AetherIIBlocks.AMBEROOT_LOG.get(), AetherIIBlocks.SKYROOT_LOG.get());
+        this.logDifferentTop(AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get(), AetherIIBlocks.STRIPPED_SKYROOT_LOG.get());
         this.wood(AetherIIBlocks.SKYROOT_WOOD.get(), AetherIIBlocks.SKYROOT_LOG.get());
         this.wood(AetherIIBlocks.STRIPPED_SKYROOT_WOOD.get(), AetherIIBlocks.STRIPPED_SKYROOT_LOG.get());
         this.wood(AetherIIBlocks.GREATROOT_WOOD.get(), AetherIIBlocks.GREATROOT_LOG.get());
@@ -117,6 +118,7 @@ public class AetherIIBlockStateData extends AetherIIBlockStateProvider {
         this.wood(AetherIIBlocks.WISPROOT_WOOD.get(), AetherIIBlocks.WISPROOT_LOG.get());
         this.wood(AetherIIBlocks.STRIPPED_WISPROOT_WOOD.get(), AetherIIBlocks.STRIPPED_WISPROOT_LOG.get());
         this.wood(AetherIIBlocks.AMBEROOT_WOOD.get(), AetherIIBlocks.AMBEROOT_LOG.get());
+        this.wood(AetherIIBlocks.STRIPPED_AMBEROOT_WOOD.get(), AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get());
 
         // Leaf Pile
         this.leafPile(AetherIIBlocks.SKYROOT_LEAF_PILE.get(), AetherIIBlocks.SKYROOT_LEAVES.get());
@@ -515,6 +517,9 @@ public class AetherIIBlockStateData extends AetherIIBlockStateProvider {
 
         this.signBlock(AetherIIBlocks.WISPROOT_SIGN.get(), AetherIIBlocks.WISPROOT_WALL_SIGN.get(), this.texture(this.name(AetherIIBlocks.WISPROOT_PLANKS.get()), "construction/"));
         this.hangingSignBlock(AetherIIBlocks.WISPROOT_HANGING_SIGN.get(), AetherIIBlocks.WISPROOT_WALL_HANGING_SIGN.get(), this.texture(this.name(AetherIIBlocks.STRIPPED_SKYROOT_LOG.get()), "natural/"));
+        
+        this.signBlock(AetherIIBlocks.AMBEROOT_SIGN.get(), AetherIIBlocks.AMBEROOT_WALL_SIGN.get(), this.texture(this.name(AetherIIBlocks.AMBEROOT_PLANKS.get()), "construction/"));
+        this.hangingSignBlock(AetherIIBlocks.AMBEROOT_HANGING_SIGN.get(), AetherIIBlocks.AMBEROOT_WALL_HANGING_SIGN.get(), this.texture(this.name(AetherIIBlocks.STRIPPED_AMBEROOT_LOG.get()), "natural/"));
 
         // Moa Egg
         this.moaEgg(AetherIIBlocks.MOA_EGG.get());

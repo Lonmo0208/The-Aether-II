@@ -6,67 +6,23 @@ import com.aetherteam.aetherii.entity.EntityUtil;
 import com.aetherteam.aetherii.entity.monster.Swet;
 import com.aetherteam.aetherii.network.packet.clientbound.SwetSyncPacket;
 import com.google.common.collect.Lists;
-import net.minecraft.CrashReport;
-import net.minecraft.CrashReportCategory;
-import net.minecraft.ReportedException;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.ProblemReporter;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.portal.TeleportTransition;
-import net.minecraft.world.level.storage.TagValueOutput;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Iterator;
 import java.util.List;
 
-public class SwetLatchAttachment implements ValueIOSerializable {
+public class SwetLatchAttachment {
     public static final ResourceLocation DEBUFFED_MOVEMENT_SPEED = ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "player.debuff.swet_movement_speed");
     public static final int MAX_SWET_COUNT = 3;
 
-
-    @Override
-    public void serialize(ValueOutput valueOutput) {
-        ValueOutput.ValueOutputList valueoutput$valueoutputlist = valueOutput.childrenList("swets");
-        try {
-
-            for (Swet swet : this.getLatchedSwets()) {
-                ValueOutput valueoutput1 = valueoutput$valueoutputlist.addChild();
-
-                swet.addAdditionalSaveData(valueoutput1);
-
-            }
-        } catch (Throwable throwable) {
-            CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-            CrashReportCategory crashreportcategory = crashreport.addCategory("Entity being saved");
-            this.player.fillCrashReportCategory(crashreportcategory);
-            throw new ReportedException(crashreport);
-        }
-    }
-
-    @Override
-    public void deserialize(ValueInput valueInput) {
-        ValueInput.ValueInputList list = valueInput.childrenListOrEmpty("swets");
-
-        this.getLatchedSwets().clear();
-        list.stream().forEach(valueInput1 -> {
-
-                    Swet swet = AetherIIEntityTypes.SWET.get().create(this.player.level(), EntitySpawnReason.TRIGGERED);
-                    if (swet != null) {
-                        swet.readAdditionalSaveData(valueInput1);
-                        this.getLatchedSwets().add(swet);
-                        this.syncToClient = true;
-                    }
-                }
-        );
-    }
     private final Player player;
     private final List<Swet> swets = Lists.newArrayList();
     private boolean syncToClient = false;
@@ -75,16 +31,55 @@ public class SwetLatchAttachment implements ValueIOSerializable {
         this.player = player;
     }
 
+    /**
+     * Serializes the attachment data to NBT
+     */
+    public void save(CompoundTag tag) {
+        ListTag swetsList = new ListTag();
+        try {
+            for (Swet swet : this.getLatchedSwets()) {
+                CompoundTag swetTag = new CompoundTag();
+                swet.save(swetTag);
+                swetsList.add(swetTag);
+            }
+            tag.put("swets", swetsList);
+        } catch (Throwable throwable) {
+            AetherII.LOGGER.error("Failed to save Swet data: {}", throwable.getMessage());
+        }
+    }
+
+    /**
+     * Deserializes the attachment data from NBT
+     */
+    public void load(CompoundTag tag) {
+        if (tag.contains("swets")) {
+            ListTag swetsList = tag.getList("swets", 10);
+            this.getLatchedSwets().clear();
+            for (int i = 0; i < swetsList.size(); i++) {
+                try {
+                    Swet swet = AetherIIEntityTypes.SWET.get().create(this.player.level());
+                    if (swet != null) {
+                        swet.load(swetsList.getCompound(i));
+                        this.getLatchedSwets().add(swet);
+                        this.syncToClient = true;
+                    }
+                } catch (Throwable throwable) {
+                    AetherII.LOGGER.error("Failed to load Swet data: {}", throwable.getMessage());
+                }
+            }
+        }
+    }
+
     public void postTickUpdate() {
         if (this.syncToClient) {
             if (!this.player.level().isClientSide()) {
-                try (ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(this.player.problemPath(), AetherII.LOGGER)) {
-                    TagValueOutput tagvalueoutput = TagValueOutput.createWithContext(problemreporter$scopedcollector, this.player.registryAccess());
-                    this.serialize(tagvalueoutput);
-                    PacketDistributor.sendToAllPlayers(new SwetSyncPacket(this.player.getId(), tagvalueoutput.buildResult()));
+                try {
+                    CompoundTag tag = new CompoundTag();
+                    this.save(tag);
+                    PacketDistributor.sendToAllPlayers(new SwetSyncPacket(this.player.getId(), tag));
+                } catch (Throwable throwable) {
+                    AetherII.LOGGER.error("Failed to sync Swet data: {}", throwable.getMessage());
                 }
-
-
             }
             this.syncToClient = false;
         }
@@ -136,7 +131,8 @@ public class SwetLatchAttachment implements ValueIOSerializable {
         if (this.player.level() instanceof ServerLevel serverLevel) {
             // When the server loads the Swet from NBT with read() it is created in dimension 0, because this.player has not loaded yet.
             if (swet.level() != serverLevel) {
-                swet.teleport(new TeleportTransition(serverLevel, this.player.position(), this.player.getDeltaMovement(), this.player.getYRot(), this.player.getXRot(), TeleportTransition.DO_NOTHING));
+                swet.moveTo(serverLevel, this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
+                swet.setDeltaMovement(this.player.getDeltaMovement());
             } else {
                 swet.setPos(this.player.position());
                 this.player.level().addFreshEntity(swet);
@@ -159,5 +155,4 @@ public class SwetLatchAttachment implements ValueIOSerializable {
     public List<Swet> getLatchedSwets() {
         return this.swets;
     }
-
 }

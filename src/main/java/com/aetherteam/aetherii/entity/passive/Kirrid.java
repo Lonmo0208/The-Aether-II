@@ -705,6 +705,13 @@ public class Kirrid extends AetherAnimal implements Shearable, IShearable {
         private static final Map<Kirrid.KirridColor, Integer> DECIMAL_COLOR_BY_KIRRID_COLOR = Maps.<Kirrid.KirridColor, Integer>newEnumMap(Arrays.stream(Kirrid.KirridColor.values()).collect(Collectors.toMap(color -> color, color -> color.color)));
         private static final Map<Kirrid.KirridColor, DyeColor> DYE_COLOR_BY_KIRRID_COLOR = Maps.<Kirrid.KirridColor, DyeColor>newEnumMap(Arrays.stream(Kirrid.KirridColor.values()).collect(Collectors.toMap(color -> color, color -> color.dyeColor)));
         private static final Map<Kirrid.KirridColor, ItemLike> CLOUDWOOL_BY_KIRRID_COLOR = Maps.<Kirrid.KirridColor, ItemLike>newEnumMap(Arrays.stream(Kirrid.KirridColor.values()).collect(Collectors.toMap(color -> color, color -> color.wool)));
+        
+        /**
+         * 获取所有颜色的羊毛方块映射
+         */
+        public static Map<Kirrid.KirridColor, ItemLike> getCloudwoolByColor() {
+            return CLOUDWOOL_BY_KIRRID_COLOR;
+        }
 
         private final int id;
         private final int color;
