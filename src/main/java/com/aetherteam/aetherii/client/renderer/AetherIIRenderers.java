@@ -1,12 +1,24 @@
 package com.aetherteam.aetherii.client.renderer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.aetherteam.aetherii.AetherII;
 import com.aetherteam.aetherii.attachment.AetherIIDataAttachments;
+import com.aetherteam.aetherii.block.AetherIIBlocks;
 import com.aetherteam.aetherii.blockentity.AetherIIBlockEntityTypes;
 import com.aetherteam.aetherii.client.renderer.accessory.GlovesLayer;
 import com.aetherteam.aetherii.client.renderer.accessory.model.GlovesModel;
-import com.aetherteam.aetherii.client.renderer.block.model.TrunkModel;
+import com.aetherteam.aetherii.client.renderer.block.model.blockstate.TrunkModel;
 import com.aetherteam.aetherii.client.renderer.blockentity.*;
+import com.aetherteam.aetherii.client.renderer.block.model.blockstate.AmbientOcclusionLightModel;
+import com.aetherteam.aetherii.client.renderer.block.model.blockstate.FastModel;
+import com.aetherteam.aetherii.client.renderer.blockentity.AlkahestPurifierRenderer;
+import com.aetherteam.aetherii.client.renderer.blockentity.ArkeniumForgeRenderer;
+import com.aetherteam.aetherii.client.renderer.blockentity.MoaEggRenderer;
+import com.aetherteam.aetherii.client.renderer.blockentity.SkyrootBedRenderer;
+import com.aetherteam.aetherii.client.renderer.blockentity.SkyrootChestRenderer;
 import com.aetherteam.aetherii.client.renderer.blockentity.model.AlkahestPurifierModel;
 import com.aetherteam.aetherii.client.renderer.entity.*;
 import com.aetherteam.aetherii.client.renderer.entity.layers.SwetLatchLayer;
@@ -14,23 +26,36 @@ import com.aetherteam.aetherii.client.renderer.entity.model.*;
 import com.aetherteam.aetherii.client.renderer.entity.model.burrukai.ArcticBurrukaiModel;
 import com.aetherteam.aetherii.client.renderer.entity.model.burrukai.BurrukaiBabyModel;
 import com.aetherteam.aetherii.client.renderer.entity.model.burrukai.BurrukaiModel;
-import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.*;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.ArcticKirridBabyModel;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.ArcticKirridModel;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.HighfieldsKirridBabyModel;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.HighfieldsKirridModel;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.MagneticKirridBabyModel;
+import com.aetherteam.aetherii.client.renderer.entity.model.kirrid.MagneticKirridModel;
 import com.aetherteam.aetherii.client.renderer.entity.model.taegore.TaegoreBabyModel;
 import com.aetherteam.aetherii.client.renderer.entity.model.taegore.TaegoreModel;
 import com.aetherteam.aetherii.client.renderer.item.model.AlkahestPurifierSpecialRenderer;
 import com.aetherteam.aetherii.entity.AetherIIEntityTypes;
 import com.aetherteam.aetherii.entity.monster.Swet;
 import com.aetherteam.aetherii.entity.passive.Moa;
+
+import com.aetherteam.aetherii.entity.vehicle.CloudSkiff;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.BedRenderer;
+import net.minecraft.client.renderer.blockentity.CampfireRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.context.ContextKey;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -39,22 +64,23 @@ import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class AetherIIRenderers {
-    public static ContextKey<Boolean> RIDING_MOA_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "riding_moa"));
-    public static ContextKey<List<Swet>> SWET_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "swet"));
+    public static final ContextKey<Boolean> RIDING_SKIFF_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "riding_skiff"));
+    public static final ContextKey<Float> SKIFF_STEERING_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "skiff_steering"));
+    public static final ContextKey<Boolean> RIDING_MOA_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "riding_moa"));
+    public static final ContextKey<List<Swet>> SWET_KEY = new ContextKey<>(ResourceLocation.fromNamespaceAndPath(AetherII.MODID, "swet"));
 
     public static void registerAddLayer(EntityRenderersEvent.AddLayers event) {
         event.getSkins().forEach(model -> {
             if (event.getSkin(model) instanceof LivingEntityRenderer<?, ?, ?> livingEntityRenderer) {
-                livingEntityRenderer.addLayer(new SwetLatchLayer(event.getContext(), livingEntityRenderer));
-
-                livingEntityRenderer.addLayer(new GlovesLayer(livingEntityRenderer));
+                registerLivingEntityLayers(event.getContext(), livingEntityRenderer);
             }
         });
+    }
+
+    private static <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerLivingEntityLayers(EntityRendererProvider.Context context, LivingEntityRenderer<T, S, M> livingEntityRenderer) {
+        livingEntityRenderer.addLayer(new SwetLatchLayer<S, M>(context, livingEntityRenderer));
+        livingEntityRenderer.addLayer(new GlovesLayer<S, M>(livingEntityRenderer));
     }
 
     public static void registerRenderStateModifier(RegisterRenderStateModifiersEvent event) {
@@ -64,6 +90,10 @@ public class AetherIIRenderers {
                 playerRenderState.setRenderData(SWET_KEY, swets);
             }
             playerRenderState.setRenderData(RIDING_MOA_KEY, abstractClientPlayer.getVehicle() instanceof Moa);
+            if (abstractClientPlayer.getVehicle() instanceof CloudSkiff cloudSkiff) {
+                playerRenderState.setRenderData(RIDING_SKIFF_KEY, true);
+                playerRenderState.setRenderData(SKIFF_STEERING_KEY, cloudSkiff.steering);
+            }
         });
     }
 
@@ -73,8 +103,10 @@ public class AetherIIRenderers {
         event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.SKYROOT_CHEST.get(), SkyrootChestRenderer::new);
         event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.SKYROOT_BED.get(), SkyrootBedRenderer::new);
         event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.MOA_EGG.get(), MoaEggRenderer::new);
+        event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.ALTAR.get(), AltarRenderer::new);
         event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.ARKENIUM_FORGE.get(), ArkeniumForgeRenderer::new);
         event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.ALKAHEST_PURIFIER.get(), AlkahestPurifierRenderer::new);
+        event.registerBlockEntityRenderer(AetherIIBlockEntityTypes.AMBROSIUM_CAMPFIRE.get(), CampfireRenderer::new);
 
         // Entities
         // Passive
@@ -82,6 +114,7 @@ public class AetherIIRenderers {
         event.registerEntityRenderer(AetherIIEntityTypes.PHYG.get(), PhygRenderer::new);
         event.registerEntityRenderer(AetherIIEntityTypes.FLYING_COW.get(), FlyingCowRenderer::new);
         event.registerEntityRenderer(AetherIIEntityTypes.SHEEPUFF.get(), SheepuffRenderer::new);
+        event.registerEntityRenderer(AetherIIEntityTypes.AERWHALE.get(), AerwhaleRenderer::new);
         event.registerEntityRenderer(AetherIIEntityTypes.HIGHFIELDS_TAEGORE.get(), (context) -> new TaegoreRenderer(context, BiomeVariantPresets.HIGHFIELDS_TAEGORE));
         event.registerEntityRenderer(AetherIIEntityTypes.MAGNETIC_TAEGORE.get(), (context) -> new TaegoreRenderer(context, BiomeVariantPresets.MAGNETIC_TAEGORE));
         event.registerEntityRenderer(AetherIIEntityTypes.ARCTIC_TAEGORE.get(), (context) -> new TaegoreRenderer(context, BiomeVariantPresets.ARCTIC_TAEGORE));
@@ -123,6 +156,9 @@ public class AetherIIRenderers {
         // Blocks
         event.registerEntityRenderer(AetherIIEntityTypes.HOVERING_BLOCK.get(), HoveringBlockRenderer::new);
 
+        // Vehicles
+        event.registerEntityRenderer(AetherIIEntityTypes.CLOUD_SKIFF.get(), CloudSkiffRenderer::new);
+
         // Misc
         event.registerEntityRenderer(AetherIIEntityTypes.ELECTRIC_FIELD.get(), NoopRenderer::new);
     }
@@ -141,6 +177,7 @@ public class AetherIIRenderers {
         event.registerLayerDefinition(AetherIIModelLayers.PHYG, PhygModel::createBodyLayer);
         event.registerLayerDefinition(AetherIIModelLayers.FLYING_COW, FlyingCowModel::createBodyLayer);
         event.registerLayerDefinition(AetherIIModelLayers.SHEEPUFF, SheepuffModel::createBodyLayer);
+        event.registerLayerDefinition(AetherIIModelLayers.AERWHALE, AerwhaleModel::createBodyLayer);
         event.registerLayerDefinition(AetherIIModelLayers.HIGHFIELDS_TAEGORE, TaegoreModel::createBodyLayer);
         event.registerLayerDefinition(AetherIIModelLayers.HIGHFIELDS_TAEGORE_BABY, TaegoreBabyModel::createBodyLayer);
         event.registerLayerDefinition(AetherIIModelLayers.MAGNETIC_TAEGORE, TaegoreModel::createBodyLayer);
@@ -183,6 +220,9 @@ public class AetherIIRenderers {
         // NPCs
         event.registerLayerDefinition(AetherIIModelLayers.EDWARD, EdwardModel::createBodyLayer);
 
+        // Vehicles
+        event.registerLayerDefinition(AetherIIModelLayers.CLOUD_SKIFF, CloudSkiffModel::createLayer);
+
         // Accessories
         // Handwear
         event.registerLayerDefinition(AetherIIModelLayers.GLOVES, () -> GlovesModel.createLayer(new CubeDeformation(0.6F), false));
@@ -190,8 +230,41 @@ public class AetherIIRenderers {
         event.registerLayerDefinition(AetherIIModelLayers.GLOVES_FIRST_PERSON, () -> GlovesModel.createLayer(new CubeDeformation(0.25F), false));
     }
 
+    public static void registerBlockStateModels(RegisterBlockStateModels event) {
+        event.registerModel(TrunkModel.Unbaked.ID , TrunkModel.Unbaked.CODEC);
+    }
+
     public static void registerBakedModels(ModelEvent.ModifyBakingResult event) {
-        /*List<DeferredBlock<? extends Block>> fastBlocks = List.of(
+        List<DeferredBlock<? extends Block>> fastBlocks = List.of(
+                AetherIIBlocks.SKYROOT_LEAF_PILE,
+                AetherIIBlocks.SKYPLANE_LEAF_PILE,
+                AetherIIBlocks.SKYBIRCH_LEAF_PILE,
+                AetherIIBlocks.SKYPINE_LEAF_PILE,
+                AetherIIBlocks.WISPROOT_LEAF_PILE,
+                AetherIIBlocks.WISPTOP_LEAF_PILE,
+                AetherIIBlocks.GREATROOT_LEAF_PILE,
+                AetherIIBlocks.GREATOAK_LEAF_PILE,
+                AetherIIBlocks.GREATBOA_LEAF_PILE,
+                AetherIIBlocks.AMBEROOT_LEAF_PILE,
+                AetherIIBlocks.SKYROOT_LEAVES,
+                AetherIIBlocks.SKYPLANE_LEAVES,
+                AetherIIBlocks.SKYBIRCH_LEAVES,
+                AetherIIBlocks.SKYPINE_LEAVES,
+                AetherIIBlocks.WISPROOT_LEAVES,
+                AetherIIBlocks.WISPTOP_LEAVES,
+                AetherIIBlocks.GREATROOT_LEAVES,
+                AetherIIBlocks.GREATOAK_LEAVES,
+                AetherIIBlocks.GREATBOA_LEAVES,
+                AetherIIBlocks.AMBEROOT_LEAVES,
+                AetherIIBlocks.IRRADIATED_SKYROOT_LEAVES,
+                AetherIIBlocks.IRRADIATED_SKYPLANE_LEAVES,
+                AetherIIBlocks.IRRADIATED_SKYBIRCH_LEAVES,
+                AetherIIBlocks.IRRADIATED_SKYPINE_LEAVES,
+                AetherIIBlocks.IRRADIATED_WISPROOT_LEAVES,
+                AetherIIBlocks.IRRADIATED_WISPTOP_LEAVES,
+                AetherIIBlocks.IRRADIATED_GREATROOT_LEAVES,
+                AetherIIBlocks.IRRADIATED_GREATOAK_LEAVES,
+                AetherIIBlocks.IRRADIATED_GREATBOA_LEAVES,
                 AetherIIBlocks.HIGHLANDS_BUSH,
                 AetherIIBlocks.BLUEBERRY_BUSH,
                 AetherIIBlocks.POTTED_HIGHLANDS_BUSH,
@@ -201,7 +274,6 @@ public class AetherIIRenderers {
                 AetherIIBlocks.UNDERSHALE_AMBROSIUM_ORE,
                 AetherIIBlocks.BLOOMING_ARILUM,
                 AetherIIBlocks.BLOOMING_ARILUM_PLANT,
-                AetherIIBlocks.UNDERSHALE_AMBROSIUM_ORE,
                 AetherIIBlocks.DIM_GUARDIAN_ROOTS,
                 AetherIIBlocks.LUCENT_GUARDIAN_ROOTS,
                 AetherIIBlocks.GUARDIAN_LAMP,
@@ -217,7 +289,6 @@ public class AetherIIRenderers {
 
         getModels(event.getBakingResult().blockStateModels(), fastBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new FastModel(entry.getValue())));
         getModels(event.getBakingResult().blockStateModels(), aoBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new AmbientOcclusionLightModel(entry.getValue())));
- */
     }
 
     private static List<Map.Entry<BlockState, BlockStateModel>> getModels(Map<BlockState, BlockStateModel> originalModels, List<DeferredBlock<? extends Block>> blocks) {
@@ -230,10 +301,6 @@ public class AetherIIRenderers {
             }
         }
         return models;
-    }
-
-    public static void registerBlockStateModels(RegisterBlockStateModels event) {
-        event.registerModel(TrunkModel.Unbaked.ID , TrunkModel.Unbaked.CODEC);
     }
 
     public static void registerSpecialModelRenderers(RegisterSpecialModelRendererEvent event) {

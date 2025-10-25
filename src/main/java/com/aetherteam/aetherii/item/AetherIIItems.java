@@ -250,9 +250,10 @@ public class AetherIIItems {
     public static final DeferredItem<Item> BLUEBERRY = register("blueberry", () -> new Item.Properties().food(AetherIIFoods.BLUEBERRY).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
     public static final DeferredItem<Item> ENCHANTED_BLUEBERRY = register("enchanted_blueberry", () -> new Item.Properties().food(AetherIIFoods.ENCHANTED_BLUEBERRY).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
     public static final DeferredItem<Item> ORANGE = register("orange", () -> new Item.Properties().food(AetherIIFoods.ORANGE));
-    public static final DeferredItem<Item> SATIVAL_BULB = register("satival_bulb", () -> new Item.Properties().food(AetherIIFoods.SATIVAL_BULB).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
+    public static final DeferredItem<Item> ENCHANTED_ORANGE = register("enchanted_orange", () -> new Item.Properties().food(AetherIIFoods.ENCHANTED_ORANGE));
     public static final DeferredItem<Item> WYNDBERRY = register("wyndberry", () -> new Item.Properties().food(AetherIIFoods.WYNDBERRY).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
     public static final DeferredItem<Item> ENCHANTED_WYNDBERRY = register("enchanted_wyndberry", () -> new Item.Properties().food(AetherIIFoods.ENCHANTED_WYNDBERRY).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
+    public static final DeferredItem<Item> SATIVAL_BULB = register("satival_bulb", () -> new Item.Properties().food(AetherIIFoods.SATIVAL_BULB).component(DataComponents.CONSUMABLE, AetherIIConsumables.FAST));
     public static final DeferredItem<Item> GREEN_SWET_JELLY = register("green_swet_jelly", () -> new Item.Properties().food(AetherIIFoods.SWET_JELLY));
     public static final DeferredItem<Item> BLUE_SWET_JELLY = register("blue_swet_jelly", () -> new Item.Properties().food(AetherIIFoods.SWET_JELLY));
     public static final DeferredItem<Item> PURPLE_SWET_JELLY = register("purple_swet_jelly", () -> new Item.Properties().food(AetherIIFoods.SWET_JELLY));
@@ -311,6 +312,7 @@ public class AetherIIItems {
     public static final DeferredItem<SpawnEggItem> SHEEPUFF_SPAWN_EGG = register("sheepuff_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.SHEEPUFF.get(), properties));
     public static final DeferredItem<SpawnEggItem> PHYG_SPAWN_EGG = register("phyg_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.PHYG.get(), properties));
     public static final DeferredItem<SpawnEggItem> AERBUNNY_SPAWN_EGG = register("aerbunny_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.AERBUNNY.get(), properties));
+    public static final DeferredItem<SpawnEggItem> AERWHALE_SPAWN_EGG = register("aerwhale_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.AERWHALE.get(), properties));
     public static final DeferredItem<SpawnEggItem> HIGHFIELDS_TAEGORE_SPAWN_EGG = register("highfields_taegore_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.HIGHFIELDS_TAEGORE.get(), "highfields", properties));
     public static final DeferredItem<SpawnEggItem> MAGNETIC_TAEGORE_SPAWN_EGG = register("magnetic_taegore_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.MAGNETIC_TAEGORE.get(), "magnetic", properties));
     public static final DeferredItem<SpawnEggItem> ARCTIC_TAEGORE_SPAWN_EGG = register("arctic_taegore_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.ARCTIC_TAEGORE.get(), "arctic", properties));
@@ -320,7 +322,7 @@ public class AetherIIItems {
     public static final DeferredItem<SpawnEggItem> HIGHFIELDS_KIRRID_SPAWN_EGG = register("highfields_kirrid_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.HIGHFIELDS_KIRRID.get(), "highfields", properties));
     public static final DeferredItem<SpawnEggItem> MAGNETIC_KIRRID_SPAWN_EGG = register("magnetic_kirrid_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.MAGNETIC_KIRRID.get(), "magnetic", properties));
     public static final DeferredItem<SpawnEggItem> ARCTIC_KIRRID_SPAWN_EGG = register("arctic_kirrid_spawn_egg", (properties) -> new BiomeMobSpawnEggItem(AetherIIEntityTypes.ARCTIC_KIRRID.get(), "arctic", properties));
-    public static final DeferredItem<SpawnEggItem> MOA_SPAWN_EGG = register("moa_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.MOA.get(), properties));
+    public static final DeferredItem<SpawnEggItem> MOA_SPAWN_EGG = register("moa_spawn_egg", (properties) -> new MoaSpawnEggItem(AetherIIEntityTypes.MOA.get(), properties));
     public static final DeferredItem<SpawnEggItem> SKYROOT_LIZARD_SPAWN_EGG = register("skyroot_lizard_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.SKYROOT_LIZARD.get(), properties));
     public static final DeferredItem<SpawnEggItem> AECHOR_PLANT_SPAWN_EGG = register("aechor_plant_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.AECHOR_PLANT.get(), properties));
     public static final DeferredItem<SpawnEggItem> CARRION_SPROUT_SPAWN_EGG = register("carrion_sprout_spawn_egg", (properties) -> new SpawnEggItem(AetherIIEntityTypes.CARRION_SPROUT.get(), properties));
@@ -341,6 +343,7 @@ public class AetherIIItems {
     public static final DeferredItem<Item> MOA_SADDLE = register("moa_saddle", MoaSaddleItem::new, () -> new Item.Properties().stacksTo(1));
     public static final DeferredItem<Item> MOA_SADDLEBAG = register("moa_saddlebag", (properties) -> new MoaSaddlebagItem(5, properties.stacksTo(1)));
     public static final DeferredItem<Item> LARGE_MOA_SADDLEBAG = register("large_moa_saddlebag", (properties) -> new MoaSaddlebagItem(8, properties.stacksTo(1)));
+    public static final DeferredItem<Item> CLOUD_SKIFF = register("cloud_skiff", (properties) -> new CloudSkiffItem(AetherIIEntityTypes.CLOUD_SKIFF.get(), properties.stacksTo(1)));
     public static final DeferredItem<Item> GLINT_COIN = register("glint_coin", (properties) -> new CurrencyItem(1, properties));
     public static final DeferredItem<Item> GUIDEBOOK_PAGE = register("guidebook_page", GuidebookPageItem::new, () -> new Item.Properties().stacksTo(1));
     public static final DeferredItem<Item> AETHER_PORTAL_FRAME = register("aether_portal_frame", AetherPortalItem::new, () -> new Item.Properties().stacksTo(1));

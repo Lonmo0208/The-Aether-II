@@ -71,6 +71,7 @@ public class AetherIIDataMapData extends DataMapProvider {
         this.addCompost(compostables, AetherIIBlocks.LILICHIME, 0.65F);
         this.addCompost(compostables, AetherIIBlocks.BLADE_POA, 0.65F);
         this.addCompost(compostables, AetherIIBlocks.AECHOR_CUTTING, 0.65F);
+        this.addCompost(compostables, AetherIIBlocks.CARRION_CUTTING, 0.65F);
         this.addCompost(compostables, AetherIIBlocks.HIGHLANDS_BUSH, 0.5F);
         this.addCompost(compostables, AetherIIBlocks.BLUEBERRY_BUSH, 0.5F);
         this.addCompost(compostables, AetherIIBlocks.BLUEBERRY_BUSH_STEM, 0.5F);
@@ -78,9 +79,11 @@ public class AetherIIDataMapData extends DataMapProvider {
         this.addCompost(compostables, AetherIIBlocks.BRETTL_GRASS_BUNDLE, 0.85F);
         this.addCompost(compostables, AetherIIItems.BLUEBERRY, 0.3F);
         this.addCompost(compostables, AetherIIItems.ENCHANTED_BLUEBERRY, 0.5F);
+        this.addCompost(compostables, AetherIIItems.ORANGE, 0.3F);
+        this.addCompost(compostables, AetherIIItems.ENCHANTED_ORANGE, 0.5F);
         this.addCompost(compostables, AetherIIItems.WYNDBERRY, 0.3F);
         this.addCompost(compostables, AetherIIItems.ENCHANTED_WYNDBERRY, 0.5F);
-        this.addCompost(compostables, AetherIIItems.ORANGE, 0.3F);
+        this.addCompost(compostables, AetherIIItems.SATIVAL_BULB, 0.3F);
 
         var fuels = this.builder(NeoForgeDataMaps.FURNACE_FUELS);
         fuels.add(AetherIIItems.ARKENIUM_HESTVEIL_CANISTER, new FurnaceFuel(5000), false);

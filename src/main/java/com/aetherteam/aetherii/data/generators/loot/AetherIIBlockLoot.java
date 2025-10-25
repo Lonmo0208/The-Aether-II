@@ -13,6 +13,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
@@ -102,7 +104,7 @@ public class AetherIIBlockLoot extends AetherIIBlockLootSubProvider {
         this.dropWithFortune(AetherIIBlocks.UNDERSHALE_ARKENIUM_ORE.get(), AetherIIItems.INERT_ARKENIUM.get());
         this.dropWithFortune(AetherIIBlocks.UNDERSHALE_GRAVITITE_ORE.get(), AetherIIItems.INERT_GRAVITITE.get());
         this.dropWithFortune(AetherIIBlocks.CORROBONITE_ORE.get(), AetherIIItems.CORROBONITE_CRYSTAL.get());
-        this.dropWhenSilkTouch(AetherIIBlocks.CORROBONITE_CLUSTER.get());
+        this.dropNone(AetherIIBlocks.CORROBONITE_CLUSTER.get());
 
         // Aerclouds
         this.dropSelf(AetherIIBlocks.COLD_AERCLOUD.get());
@@ -228,6 +230,7 @@ public class AetherIIBlockLoot extends AetherIIBlockLootSubProvider {
         this.add(AetherIIBlocks.HOLPUPEA.get(), this.createSegmentedBlockDrops(AetherIIBlocks.HOLPUPEA.get()));
         this.add(AetherIIBlocks.BLADE_POA.get(), this::createShearsOnlyDrop);
         this.dropSelf(AetherIIBlocks.AECHOR_CUTTING.get());
+        this.dropSelf(AetherIIBlocks.CARRION_CUTTING.get());
 
         // Potted Flowers
         this.dropPottedContents(AetherIIBlocks.POTTED_MAGNETIC_SHROOM.get());
@@ -241,6 +244,7 @@ public class AetherIIBlockLoot extends AetherIIBlockLootSubProvider {
         this.dropPottedContents(AetherIIBlocks.POTTED_PLURACIAN.get());
         this.dropPottedContents(AetherIIBlocks.POTTED_BLADE_POA.get());
         this.dropPottedContents(AetherIIBlocks.POTTED_AECHOR_CUTTING.get());
+        this.dropPottedContents(AetherIIBlocks.POTTED_CARRION_CUTTING.get());
 
         // Bushes
         this.dropSelf(AetherIIBlocks.HIGHLANDS_BUSH.get());
@@ -657,6 +661,7 @@ public class AetherIIBlockLoot extends AetherIIBlockLootSubProvider {
         this.dropSelf(AetherIIBlocks.ARKENIUM_FORGE.get());
         this.dropSelf(AetherIIBlocks.ARTISANS_BENCH.get());
         this.dropSelf(AetherIIBlocks.ALKAHEST_PURIFIER.get());
+        this.add(AetherIIBlocks.AMBROSIUM_CAMPFIRE.get(), (block) -> this.createSilkTouchDispatchTable(block, this.applyExplosionCondition(block, LootItem.lootTableItem(AetherIIItems.AMBROSIUM_SHARD).apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0F))))));
         this.dropSelf(AetherIIBlocks.SKYROOT_CHEST.get());
         this.dropSelf(AetherIIBlocks.SKYROOT_LADDER.get());
         this.add(AetherIIBlocks.SKYROOT_BED.get(), (bed) -> createSinglePropConditionTable(bed, BedBlock.PART, BedPart.HEAD));

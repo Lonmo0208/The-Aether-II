@@ -25,7 +25,6 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
     @SuppressWarnings("unchecked")
     @Override
     public void addTags(HolderLookup.Provider provider) {
-
         new AetherIIBlockItemTagProvider() {
             @Override
             protected TagAppender<Block, Block> tag(TagKey<Block> blockKey, TagKey<Item> itemKey) {
@@ -143,7 +142,15 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.MARBLED_BRICKS.get(),
                 AetherIIBlocks.ARKENIUM_BLOCK.get(),
                 AetherIIBlocks.ARKENIUM_DOOR.get(),
-                AetherIIBlocks.ARKENIUM_TRAPDOOR.get()).addTags(AetherIITags.Blocks.ICHORITE_DECORATIVE_BLOCKS, AetherIITags.Blocks.MARBLED_ICHORITE_DECORATIVE_BLOCKS);
+                AetherIIBlocks.ARKENIUM_TRAPDOOR.get()
+        ).addTags(
+                AetherIITags.Blocks.ICHORITE_DECORATIVE_BLOCKS,
+                AetherIITags.Blocks.MARBLED_ICHORITE_DECORATIVE_BLOCKS,
+                AetherIITags.Blocks.SCATTERGLASS,
+                AetherIITags.Blocks.SCATTERGLASS_PANE,
+                AetherIITags.Blocks.CRUDE_SCATTERGLASS,
+                AetherIITags.Blocks.CRUDE_SCATTERGLASS_PANE
+        );
         this.tag(AetherIITags.Blocks.ALKAHEST_INSTANTLY_DESTROYS).addTags(BlockTags.LEAVES, AetherIITags.Blocks.AERCLOUDS);
         this.tag(AetherIITags.Blocks.ALKAHEST_QUICKLY_DESTROYS).addTags(BlockTags.DIRT, BlockTags.LOGS, BlockTags.PLANKS);
         this.tag(AetherIITags.Blocks.ALKAHEST_SLOWLY_DESTROYS).addTags(AetherIITags.Blocks.HOLYSTONE, Tags.Blocks.STONES);
@@ -444,9 +451,11 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.LILICHIME.get(),
                 AetherIIBlocks.PLURACIAN.get(),
                 AetherIIBlocks.SATIVAL_SHOOT.get(),
-                AetherIIBlocks.AECHOR_CUTTING.get()
+                AetherIIBlocks.AECHOR_CUTTING.get(),
+                AetherIIBlocks.CARRION_CUTTING.get()
         );
         this.tag(BlockTags.BEDS).add(AetherIIBlocks.SKYROOT_BED.get());
+        this.tag(BlockTags.CAMPFIRES).add(AetherIIBlocks.AMBROSIUM_CAMPFIRE.get());
         this.tag(BlockTags.DIRT).addTag(AetherIITags.Blocks.AETHER_DIRT).add(
                 AetherIIBlocks.BRYALINN_MOSS_BLOCK.get(),
                 AetherIIBlocks.SHAYELINN_MOSS_BLOCK.get(),
@@ -476,7 +485,8 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.POTTED_LILICHIME.get(),
                 AetherIIBlocks.POTTED_PLURACIAN.get(),
                 AetherIIBlocks.POTTED_BLADE_POA.get(),
-                AetherIIBlocks.POTTED_AECHOR_CUTTING.get()
+                AetherIIBlocks.POTTED_AECHOR_CUTTING.get(),
+                AetherIIBlocks.POTTED_CARRION_CUTTING.get()
         );
         this.tag(BlockTags.ENDERMAN_HOLDABLE).addTag(AetherIITags.Blocks.AETHER_DIRT).add(
                 AetherIIBlocks.QUICKSOIL.get(),
@@ -561,10 +571,12 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
         );
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(
                 AetherIIBlocks.HOLYSTONE.get(),
+                AetherIIBlocks.UNSTABLE_HOLYSTONE.get(),
                 AetherIIBlocks.MOSSY_HOLYSTONE.get(),
                 AetherIIBlocks.IRRADIATED_HOLYSTONE.get(),
                 AetherIIBlocks.IRRADIATED_DUST_BLOCK.get(),
                 AetherIIBlocks.UNDERSHALE.get(),
+                AetherIIBlocks.UNSTABLE_UNDERSHALE.get(),
                 AetherIIBlocks.AGIOSITE.get(),
                 AetherIIBlocks.ICHORITE.get(),
                 AetherIIBlocks.POINTED_HOLYSTONE.get(),
@@ -589,7 +601,6 @@ public class AetherIIBlockTagData extends BlockTagsProvider {
                 AetherIIBlocks.UNDERSHALE_ARKENIUM_ORE.get(),
                 AetherIIBlocks.UNDERSHALE_GRAVITITE_ORE.get(),
                 AetherIIBlocks.CORROBONITE_ORE.get(),
-                AetherIIBlocks.CORROBONITE_CLUSTER.get(),
                 AetherIIBlocks.HOLYSTONE_STAIRS.get(),
                 AetherIIBlocks.HOLYSTONE_SLAB.get(),
                 AetherIIBlocks.HOLYSTONE_WALL.get(),
