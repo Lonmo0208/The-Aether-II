@@ -7,6 +7,7 @@ import com.aetherteam.aetherii.block.AetherIIBlocks;
 import com.aetherteam.aetherii.block.natural.*;
 import com.aetherteam.aetherii.data.resources.registries.AetherIIDensityFunctions;
 import com.aetherteam.aetherii.world.feature.AetherIIFeatures;
+import com.aetherteam.aetherii.world.feature.StructureCoverFeature;
 import com.aetherteam.aetherii.world.feature.configuration.*;
 import com.aetherteam.aetherii.world.feature.modifier.predicate.MossyPredicate;
 import com.aetherteam.aetherii.world.tree.decorator.*;
@@ -323,6 +324,11 @@ public class HolyIslesConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> UNDERGROWTH_VINE = createKey("undergrowth_vine");
     public static final ResourceKey<ConfiguredFeature<?, ?>> UNDERGROWTH_PATCH = createKey("undergrowth_patch");
 
+    public static final ResourceKey<ConfiguredFeature<?, ?>> INFECTED_GUARDIAN_TREE_ENTRANCE_COVER = createKey("infected_guardian_tree_entrance_cover");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> INFECTED_GUARDIAN_TREE_STAIRCASE_COVER = createKey("infected_guardian_tree_staircase_cover");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> INFECTED_GUARDIAN_TREE_LOBBY_COVER = createKey("infected_guardian_tree_lobby_cover");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> INFECTED_GUARDIAN_TREE_BOSS_ROOM_COVER = createKey("infected_guardian_tree_boss_room_cover");
+
 
     // Air
     public static final ResourceKey<ConfiguredFeature<?, ?>> COLD_AERCLOUD = createKey("cold_aercloud");
@@ -416,14 +422,14 @@ public class HolyIslesConfiguredFeatures {
                 UniformInt.of(2, 4),
                 Optional.empty(),
                 0.0F,
-                AetherIITags.Blocks.FALLEN_LOG_SURVIVES_ON
+                AetherIITags.Blocks.SUPPORTS_FALLEN_LOG
         ));
         register(context, FALLEN_WISPROOT_LOG, AetherIIFeatures.FALLEN_LOG.get(), new FallenLogConfiguration(
                 BlockStateProvider.simple(AetherIIBlocks.WISPROOT_LOG.get()),
                 UniformInt.of(3, 6),
                 Optional.empty(),
                 0.0F,
-                AetherIITags.Blocks.FALLEN_LOG_SURVIVES_ON
+                AetherIITags.Blocks.SUPPORTS_FALLEN_LOG
         ));
         register(context, MOA_NEST, AetherIIFeatures.MOA_NEST.get(), new MoaNestConfiguration(BlockStateProvider.simple(AetherIIBlocks.WOVEN_SKYROOT_STICKS.get()), 1.5F, 2, true));
     }
@@ -562,7 +568,7 @@ public class HolyIslesConfiguredFeatures {
                         new WeightedPlacedFeature(PlacementUtils.inlinePlaced( AetherIIFeatures.AETHER_FLOWER.get(),
                                 new SimpleBlockConfiguration(new WeightedStateProvider(holpupea)),
                                 BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.anyOf(
-                                                BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.AETHER_PLANT_SURVIVES_ON),
+                                                BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.SUPPORTS_AETHER_PLANT),
                                                 new MossyPredicate(Vec3i.ZERO.below())), BlockPredicate.replaceable(), BlockPredicate.noFluid()))), 0.5F)
 
                 ), PlacementUtils.inlinePlaced(AetherIIFeatures.AETHER_FLOWER.get(),
@@ -578,7 +584,7 @@ public class HolyIslesConfiguredFeatures {
                                                 AetherIIBlocks.SATIVAL_SHOOT.get().defaultBlockState()
                                         )
                                 )
-                        ), BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.anyOf(BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.AETHER_PLANT_SURVIVES_ON), new MossyPredicate(Vec3i.ZERO.below())), BlockPredicate.replaceable(), BlockPredicate.noFluid())))
+                        ), BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.anyOf(BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.SUPPORTS_AETHER_PLANT), new MossyPredicate(Vec3i.ZERO.below())), BlockPredicate.replaceable(), BlockPredicate.noFluid())))
                 )
         );
         register(context, MAGNETIC_SHROOM_PATCH, Feature.SIMPLE_BLOCK, new SimpleBlockConfiguration(BlockStateProvider.simple(AetherIIBlocks.MAGNETIC_SHROOM.get().defaultBlockState())));
@@ -604,12 +610,12 @@ public class HolyIslesConfiguredFeatures {
                         new WeightedPlacedFeature(PlacementUtils.inlinePlaced(
                                 AetherIIFeatures.ARILUM.get(),
                                 new ArilumConfiguration(SimpleStateProvider.simple(AetherIIBlocks.ARILUM.get()), SimpleStateProvider.simple(AetherIIBlocks.ARILUM_PLANT.get()), UniformInt.of(1, 7), ConstantInt.of(0)),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.ARILUM_SURVIVES_ON), BlockPredicate.matchesBlocks(Blocks.WATER)))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.SUPPORTS_ARILUM), BlockPredicate.matchesBlocks(Blocks.WATER)))
                         ), 0.5F)),
                         PlacementUtils.inlinePlaced(
                                 AetherIIFeatures.ARILUM.get(),
                                 new ArilumConfiguration(SimpleStateProvider.simple(AetherIIBlocks.BLOOMING_ARILUM.get()), SimpleStateProvider.simple(AetherIIBlocks.BLOOMING_ARILUM_PLANT.get()), UniformInt.of(1, 3), UniformInt.of(4, 6)),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.ARILUM_SURVIVES_ON), BlockPredicate.matchesBlocks(Blocks.WATER))))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.SUPPORTS_ARILUM), BlockPredicate.matchesBlocks(Blocks.WATER))))
                 )
         );
 
@@ -1057,9 +1063,9 @@ public class HolyIslesConfiguredFeatures {
                         .build());
 
         register(context, TREES_BIOME_FRIGID_SIERRA, Feature.RANDOM_SELECTOR, new RandomFeatureConfiguration(List.of(
-                new WeightedPlacedFeature(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(SKYPINE_DECORATED), BlockPredicateFilter.forPredicate(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.ARCTIC_TREE_SURVIVES_ON))), 0.1F),
+                new WeightedPlacedFeature(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(SKYPINE_DECORATED), BlockPredicateFilter.forPredicate(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.SUPPORTS_ARCTIC_TREE))), 0.1F),
                 new WeightedPlacedFeature(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(TREES_AMBEROOT_SNOWY), PlacementUtils.filteredByBlockSurvival(AetherIIBlocks.AMBEROOT_SAPLING.get())), 0.0025F)
-        ), PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(GREATBOA_DECORATED), BlockPredicateFilter.forPredicate(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.ARCTIC_TREE_SURVIVES_ON)))));
+        ), PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(GREATBOA_DECORATED), BlockPredicateFilter.forPredicate(BlockPredicate.matchesTag(BlockPos.ZERO.below(), AetherIITags.Blocks.SUPPORTS_ARCTIC_TREE)))));
         register(context, TREES_BIOME_ENDURING_WOODLANDS, Feature.RANDOM_SELECTOR, new RandomFeatureConfiguration(List.of(
                 new WeightedPlacedFeature(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(GREATBOA_DECORATED), PlacementUtils.filteredByBlockSurvival(AetherIIBlocks.GREATBOA_SAPLING.get())), 0.03F),
                 new WeightedPlacedFeature(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(TREES_AMBEROOT_SNOWY), PlacementUtils.filteredByBlockSurvival(AetherIIBlocks.AMBEROOT_SAPLING.get())), 0.00375F)
@@ -1634,7 +1640,7 @@ public class HolyIslesConfiguredFeatures {
                         PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(SKY_ROOTS),
                                 CountPlacement.of(20),
                                 RandomOffsetPlacement.ofTriangle(4, 4),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SKY_ROOTS_SURVIVES_ON), BlockPredicate.ONLY_IN_AIR_PREDICATE))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SUPPORTS_SKY_ROOTS), BlockPredicate.ONLY_IN_AIR_PREDICATE))
                         ),
                         CaveSurface.CEILING,
                         UniformInt.of(1, 2),
@@ -1655,7 +1661,7 @@ public class HolyIslesConfiguredFeatures {
                         PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(FROSTED_SKY_ROOTS),
                                 CountPlacement.of(20),
                                 RandomOffsetPlacement.ofTriangle(4, 4),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SKY_ROOTS_SURVIVES_ON), BlockPredicate.ONLY_IN_AIR_PREDICATE))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SUPPORTS_SKY_ROOTS), BlockPredicate.ONLY_IN_AIR_PREDICATE))
                         ),
                         CaveSurface.CEILING,
                         UniformInt.of(1, 2),
@@ -1676,7 +1682,7 @@ public class HolyIslesConfiguredFeatures {
                         PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(ICE_CRYSTALS),
                                 CountPlacement.of(20),
                                 RandomOffsetPlacement.ofTriangle(4, 4),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.ICE_CRYSTAL_SURVIVES_ON), BlockPredicate.ONLY_IN_AIR_PREDICATE))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SUPPORTS_ICE_CRYSTAL), BlockPredicate.ONLY_IN_AIR_PREDICATE))
                         ),
                         CaveSurface.CEILING,
                         UniformInt.of(1, 2),
@@ -1864,7 +1870,7 @@ public class HolyIslesConfiguredFeatures {
                 COARSE_AETHER_DIRT_SURFACE,
                 Feature.VEGETATION_PATCH,
                 new VegetationPatchConfiguration(
-                        AetherIITags.Blocks.AETHER_PLANT_SURVIVES_ON,
+                        AetherIITags.Blocks.SUPPORTS_AETHER_PLANT,
                         BlockStateProvider.simple(AetherIIBlocks.COARSE_AETHER_DIRT.get()),
                         PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(HOLYSTONE_ROCKS)),
                         CaveSurface.FLOOR,
@@ -1890,7 +1896,7 @@ public class HolyIslesConfiguredFeatures {
                 UniformInt.of(112, 156),
                 Optional.of(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(HolyIslesConfiguredFeatures.BRETTL_PLANT),
                         RandomOffsetPlacement.vertical(ConstantInt.of(1)),
-                        BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.BRETTL_PLANT_SURVIVES_ON), BlockPredicate.ONLY_IN_AIR_PREDICATE)))),
+                        BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.below(), AetherIITags.Blocks.SUPPORTS_BRETTL_PLANT), BlockPredicate.ONLY_IN_AIR_PREDICATE)))),
                 0.01F,
                 AetherIITags.Blocks.QUICKSOIL_COAST_GENERATES_ON
         ));
@@ -1947,7 +1953,7 @@ public class HolyIslesConfiguredFeatures {
                         List.of(new WeightedPlacedFeature( PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(ICE_CRYSTALS),
                                 CountPlacement.of(20),
                                 RandomOffsetPlacement.ofTriangle(4, 4),
-                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.ICE_CRYSTAL_SURVIVES_ON), BlockPredicate.ONLY_IN_AIR_PREDICATE))
+                                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(BlockPredicate.matchesTag(Vec3i.ZERO.above(), AetherIITags.Blocks.SUPPORTS_ICE_CRYSTAL), BlockPredicate.ONLY_IN_AIR_PREDICATE))
                         ), 0.35F)),
                         PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(ICE),
                                 CountPlacement.of(20),
@@ -2266,6 +2272,7 @@ public class HolyIslesConfiguredFeatures {
     private static void bootstrapDungeon(BootstrapContext<ConfiguredFeature<?, ?>> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
         HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
+        HolderGetter<DensityFunction> function = context.lookup(Registries.DENSITY_FUNCTION);
 
         register(
                 context,
@@ -2405,6 +2412,55 @@ public class HolyIslesConfiguredFeatures {
                         1.0F,
                         UniformInt.of(2, 3),
                         0.6F));
+
+        register(context, INFECTED_GUARDIAN_TREE_ENTRANCE_COVER, AetherIIFeatures.STRUCTURE_COVER.get(),
+                new StructureCoverConfiguration(
+                        BlockStateProvider.simple(AetherIIBlocks.HOLYSTONE.get().defaultBlockState()),
+                        BlockStateProvider.simple(AetherIIBlocks.UNDERSHALE.get().defaultBlockState()),
+                        95,
+                        AetherIIDensityFunctions.getFunction(function, AetherIIDensityFunctions.DUNGEONS_STRUCTURE_COVER),
+                        16.0F,
+                        12,
+                        0.0125F,
+                        0.05F,
+                        StructureCoverFeature.CalculationType.BOTTOM_TO_TOP
+                ));
+        register(context, INFECTED_GUARDIAN_TREE_STAIRCASE_COVER, AetherIIFeatures.STRUCTURE_COVER.get(),
+                new StructureCoverConfiguration(
+                        BlockStateProvider.simple(AetherIIBlocks.HOLYSTONE.get().defaultBlockState()),
+                        BlockStateProvider.simple(AetherIIBlocks.UNDERSHALE.get().defaultBlockState()),
+                        95,
+                        AetherIIDensityFunctions.getFunction(function, AetherIIDensityFunctions.DUNGEONS_STRUCTURE_COVER),
+                        16.0F,
+                        20,
+                        0.0125F,
+                        0.05F,
+                        StructureCoverFeature.CalculationType.BOTTOM_TO_TOP
+                ));
+        register(context, INFECTED_GUARDIAN_TREE_LOBBY_COVER, AetherIIFeatures.STRUCTURE_COVER.get(),
+                new StructureCoverConfiguration(
+                        BlockStateProvider.simple(AetherIIBlocks.HOLYSTONE.get().defaultBlockState()),
+                        BlockStateProvider.simple(AetherIIBlocks.UNDERSHALE.get().defaultBlockState()),
+                        95,
+                        AetherIIDensityFunctions.getFunction(function, AetherIIDensityFunctions.DUNGEONS_STRUCTURE_COVER),
+                        22.0F,
+                        14,
+                        0.0075F,
+                        0.05F,
+                        StructureCoverFeature.CalculationType.BOTTOM_TO_TOP
+                ));
+        register(context, INFECTED_GUARDIAN_TREE_BOSS_ROOM_COVER, AetherIIFeatures.STRUCTURE_COVER.get(),
+                new StructureCoverConfiguration(
+                        BlockStateProvider.simple(AetherIIBlocks.HOLYSTONE.get().defaultBlockState()),
+                        BlockStateProvider.simple(AetherIIBlocks.UNDERSHALE.get().defaultBlockState()),
+                        95,
+                        AetherIIDensityFunctions.getFunction(function, AetherIIDensityFunctions.DUNGEONS_STRUCTURE_COVER),
+                        24.0F,
+                        28,
+                        0.0075F,
+                        0.05F,
+                        StructureCoverFeature.CalculationType.BOTTOM_TO_TOP
+                ));
     }
 
     private static ResourceKey<ConfiguredFeature<?, ?>> createKey(String name) {

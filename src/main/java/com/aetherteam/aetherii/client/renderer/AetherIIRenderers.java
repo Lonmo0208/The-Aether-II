@@ -3,7 +3,9 @@ package com.aetherteam.aetherii.client.renderer;
 import com.aetherteam.aetherii.AetherII;
 import com.aetherteam.aetherii.attachment.AetherIIDataAttachments;
 import com.aetherteam.aetherii.block.AetherIIBlocks;
+import com.aetherteam.aetherii.block.AetherIIFluids;
 import com.aetherteam.aetherii.blockentity.AetherIIBlockEntityTypes;
+import com.aetherteam.aetherii.client.renderer.level.DungeonBlockOverlayRenderer;
 import com.aetherteam.aetherii.client.renderer.accessory.AccessoryLayer;
 import com.aetherteam.aetherii.client.renderer.accessory.GlovesLayer;
 import com.aetherteam.aetherii.client.renderer.accessory.model.GlovesModel;
@@ -28,10 +30,15 @@ import com.aetherteam.aetherii.entity.passive.Aerbunny;
 import com.aetherteam.aetherii.entity.passive.Moa;
 import com.aetherteam.aetherii.entity.vehicle.CloudSkiff;
 import com.google.common.reflect.TypeToken;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.blockentity.CampfireRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -40,6 +47,9 @@ import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.EntityType;
@@ -87,24 +97,26 @@ public class AetherIIRenderers {
     public static void registerRenderStateModifier(RegisterRenderStateModifiersEvent event) {
         event.registerEntityModifier(new TypeToken<AvatarRenderer<?>>(AvatarRenderer.class) {
         }, (abstractClientPlayer, playerRenderState) -> {
-            List<Swet> swets = abstractClientPlayer.getData(AetherIIDataAttachments.SWET_LATCH).getLatchedSwets();
-            if (swets != null) {
-                List<SwetRenderState> states = new ArrayList<>();
-                for (Swet swet : swets) {
-                    SwetRenderState state = new SwetRenderState();
-                    state.entityType = swet.getType();
-                    state.swetScale = swet.getSwetScale();
-                    states.add(state);
+            if (abstractClientPlayer instanceof LocalPlayer localPlayer) {
+                List<Swet> swets = abstractClientPlayer.getData(AetherIIDataAttachments.SWET_LATCH).getLatchedSwets();
+                if (swets != null) {
+                    List<SwetRenderState> states = new ArrayList<>();
+                    for (Swet swet : swets) {
+                        SwetRenderState state = new SwetRenderState();
+                        state.entityType = swet.getType();
+                        state.swetScale = swet.getSwetScale();
+                        states.add(state);
+                    }
+                    playerRenderState.setRenderData(SWET_KEY, states);
                 }
-                playerRenderState.setRenderData(SWET_KEY, states);
+                playerRenderState.setRenderData(RIDING_MOA_KEY, abstractClientPlayer.getVehicle() instanceof Moa);
+                if (abstractClientPlayer.getVehicle() instanceof CloudSkiff cloudSkiff) {
+                    playerRenderState.setRenderData(RIDING_SKIFF_KEY, true);
+                    playerRenderState.setRenderData(SKIFF_STEERING_KEY, cloudSkiff.steering);
+                }
+                playerRenderState.setRenderData(STUCK_PROJECTILES_KEY, abstractClientPlayer.getData(AetherIIDataAttachments.PLAYER).getStuckProjectiles());
+                playerRenderState.setRenderData(HAS_AERBUNNY, abstractClientPlayer.getFirstPassenger() instanceof Aerbunny);
             }
-            playerRenderState.setRenderData(RIDING_MOA_KEY, abstractClientPlayer.getVehicle() instanceof Moa);
-            if (abstractClientPlayer.getVehicle() instanceof CloudSkiff cloudSkiff) {
-                playerRenderState.setRenderData(RIDING_SKIFF_KEY, true);
-                playerRenderState.setRenderData(SKIFF_STEERING_KEY, cloudSkiff.steering);
-            }
-            playerRenderState.setRenderData(STUCK_PROJECTILES_KEY, abstractClientPlayer.getData(AetherIIDataAttachments.PLAYER).getStuckProjectiles());
-            playerRenderState.setRenderData(HAS_AERBUNNY, abstractClientPlayer.getFirstPassenger() instanceof Aerbunny);
         });
     }
 
@@ -284,6 +296,17 @@ public class AetherIIRenderers {
         event.registerModel(TrunkModel.Unbaked.ID, TrunkModel.Unbaked.CODEC);
     }
 
+    public static void registerFluidModels(RegisterFluidModelsEvent event) {
+        FluidModel.Unbaked alkahestModel = new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "fluid/alkahest_still")),
+                new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "fluid/alkahest_flow")),
+                new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "fluid/alkahest_overlay")),
+                null
+        );
+        event.register(alkahestModel, AetherIIFluids.ALKAHEST);
+        event.register(alkahestModel, AetherIIFluids.FLOWING_ALKAHEST);
+    }
+
     public static void registerBakedModels(ModelEvent.ModifyBakingResult event) {
         List<DeferredBlock<? extends Block>> overlaidLeafBlocks = List.of(
                 AetherIIBlocks.SKYROOT_LEAVES,
@@ -326,18 +349,17 @@ public class AetherIIRenderers {
                 AetherIIBlocks.LUCENT_GUARDIAN_ROOTS,
                 AetherIIBlocks.GUARDIAN_LAMP);
         List<DeferredBlock<? extends Block>> breakingFixBlocks = List.of(
-                AetherIIBlocks.AETHER_GRASS_BLOCK,
-                AetherIIBlocks.MOA_EGG);
+                AetherIIBlocks.AETHER_GRASS_BLOCK);
         List<DeferredBlock<? extends Block>> copyBlocks = List.of(
                 AetherIIBlocks.LOCKED_BLOCK,
                 AetherIIBlocks.BOSS_DOORWAY_BLOCK,
                 AetherIIBlocks.TREASURE_DOORWAY_BLOCK);
 
-//        getModels(event.getBakingResult().blockStateModels(), overlaidLeafBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new OverlaidLeavesModel(entry.getValue())));
+        getModels(event.getBakingResult().blockStateModels(), overlaidLeafBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new OverlaidLeavesModel(entry.getValue()))); //todo
         getModels(event.getBakingResult().blockStateModels(), aoBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new AmbientOcclusionLightModel(entry.getValue())));
         getModels(event.getBakingResult().blockStateModels(), breakingFixBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new BreakingFixModel(entry.getValue())));
 //        getModels(event.getBakingResult().blockStateModels(), List.of(AetherIIBlocks.MURAL)).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new MuralModel(entry.getValue()))); //todo
-//        getModels(event.getBakingResult().blockStateModels(), copyBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new CopyBlockModel(entry.getValue())));
+        getModels(event.getBakingResult().blockStateModels(), copyBlocks).forEach(entry -> event.getBakingResult().blockStateModels().put(entry.getKey(), new CopyBlockModel(entry.getValue())));
     }
 
     private static List<Map.Entry<BlockState, BlockStateModel>> getModels(Map<BlockState, BlockStateModel> originalModels, List<DeferredBlock<? extends Block>> blocks) {
@@ -358,7 +380,16 @@ public class AetherIIRenderers {
         event.register(Identifier.fromNamespaceAndPath(AetherII.MODID, "vase"), VaseSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(Identifier.fromNamespaceAndPath(AetherII.MODID, "sentry_crate"), SentryCrateSpecialRenderer.Unbaked.MAP_CODEC);
         event.register(Identifier.fromNamespaceAndPath(AetherII.MODID, "sentry_spawner"), SentrySpawnerSpecialRenderer.Unbaked.MAP_CODEC);
-//        event.register(Identifier.fromNamespaceAndPath(AetherII.MODID, "copy_block"), CopyBlockSpecialRenderer.Unbaked.MAP_CODEC);
+        event.register(Identifier.fromNamespaceAndPath(AetherII.MODID, "copy_block"), CopyBlockSpecialRenderer.Unbaked.MAP_CODEC);
+    }
+
+    public static void submitCustomGeometryRendering(SubmitCustomGeometryEvent event) {
+        LevelRenderState levelRenderState = event.getLevelRenderState();
+        PoseStack poseStack = event.getPoseStack();
+        SubmitNodeCollector submitNodeCollector = event.getSubmitNodeCollector();
+        CameraRenderState cameraRenderState = levelRenderState.cameraRenderState;
+
+        DungeonBlockOverlayRenderer.submitDungeonBlockOverlays(poseStack, submitNodeCollector, cameraRenderState.pos, cameraRenderState.cullFrustum, Minecraft.getInstance());
     }
 
     public static boolean isFastBlock(BlockState state) {

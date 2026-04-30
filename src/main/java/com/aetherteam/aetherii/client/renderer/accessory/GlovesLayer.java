@@ -25,7 +25,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.HumanoidArm;
@@ -35,6 +34,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import org.joml.Vector3f;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLayer<S, M> implements FirstPersonRendering {
     private static final Function<ArmorStyle.SpriteKey, TextureAtlasSprite> ARMOR_STYLE_SPRITE_LOOKUP = Util.memoize((key) -> Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AetherIIAtlases.ARMOR_STYLES_ID).getSprite(key.textureId()));
@@ -59,18 +59,21 @@ public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityMode
                 Identifier texture = Identifier.fromNamespaceAndPath(id.getNamespace(), "textures/entity/equipment/humanoid_gloves/" + id.getPath() + ".png");
                 GlovesModel glovesModel = this.glovesModel;
 
-                if (this.getParentModel() instanceof HumanoidModel humanoidModel) {
+                if (this.getParentModel() instanceof HumanoidModel<?> humanoidModel) {
                     if (humanoidModel instanceof PlayerModel playerModel) {
                         PlayerModelAccessor playerModelAccessor = (PlayerModelAccessor) playerModel;
                         glovesModel = playerModelAccessor.aether$getSlim() ? this.glovesModelSlim : this.glovesModel;
                     }
                     copyPropertiesTo(glovesModel, humanoidModel);
                 }
-                glovesModel.root().getAllParts().forEach(part -> part.visible = false);
+                glovesModel.head.visible = false;
+                glovesModel.body.visible = false;
+                glovesModel.leftLeg.visible = false;
+                glovesModel.rightLeg.visible = false;
                 glovesModel.leftArm.visible = true;
                 glovesModel.rightArm.visible = true;
 
-                submitNodeCollector
+                submitNodeCollector.order(0)
                         .submitModel(
                                 glovesModel,
                                 humanoidRenderState,
@@ -84,30 +87,27 @@ public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityMode
                                 null
                         );
 
-                if (stack.has(DataComponents.DYED_COLOR)) {
-                    IClientItemExtensions extensions = IClientItemExtensions.of(stack);
-                    int color = ARGB.opaque(extensions.getDefaultDyeColor(stack));
+                IClientItemExtensions extensions = IClientItemExtensions.of(stack);
+                int color = ARGB.opaque(extensions.getDefaultDyeColor(stack));
 
-                    submitNodeCollector
-                            .submitModel(
-                                    glovesModel,
-                                    humanoidRenderState,
-                                    poseStack,
-                                    RenderTypes.armorCutoutNoCull(texture),
-                                    packedLight,
-                                    OverlayTexture.NO_OVERLAY,
-                                    color,
-                                    null,
-                                    s.outlineColor,
-                                    null
-                            );
-
-                }
+                submitNodeCollector.order(1)
+                        .submitModel(
+                                glovesModel,
+                                humanoidRenderState,
+                                poseStack,
+                                RenderTypes.armorCutoutNoCull(texture),
+                                packedLight,
+                                OverlayTexture.NO_OVERLAY,
+                                color,
+                                null,
+                                s.outlineColor,
+                                null
+                        );
 
                 ArmorStyle style = stack.get(AetherIIDataComponents.ARMOR_STYLE);
                 if (style != null && Minecraft.getInstance().level != null) {
                     TextureAtlasSprite sprite = ARMOR_STYLE_SPRITE_LOOKUP.apply(new ArmorStyle.SpriteKey(Minecraft.getInstance().level.registryAccess(), style, "humanoid_gloves"));
-                    submitNodeCollector
+                    submitNodeCollector.order(1)
                             .submitModel(
                                     glovesModel,
                                     humanoidRenderState,
@@ -125,7 +125,7 @@ public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityMode
         }
     }
 
-    public void copyPropertiesTo(HumanoidModel model, HumanoidModel from) {
+    public void copyPropertiesTo(HumanoidModel<?> model, HumanoidModel<?> from) {
         copyFrom(model.head, from.head);
         copyFrom(model.body, from.body);
         copyFrom(model.rightArm, from.rightArm);
@@ -151,7 +151,7 @@ public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityMode
         gloveArm.resetPose();
         gloveArm.offsetRotation(new Vector3f(playerArm.xRot, playerArm.yRot, playerArm.zRot));
 
-        collector
+        collector.order(0)
                 .submitModelPart(
                         gloveArm,
                         poseStack,
@@ -161,26 +161,24 @@ public class GlovesLayer<S extends LivingEntityRenderState, M extends EntityMode
                         null
                 );
 
-        if (stack.has(DataComponents.DYED_COLOR)) {
-            IClientItemExtensions extensions = IClientItemExtensions.of(stack);
-            int color = ARGB.opaque(extensions.getDefaultDyeColor(stack));
-            collector
-                    .submitModelPart(
-                            gloveArm,
-                            poseStack,
-                            RenderTypes.armorCutoutNoCull(texture),
-                            packedLight,
-                            OverlayTexture.NO_OVERLAY,
-                            null,
-                            color,
-                            null
-                    );
-        }
+        IClientItemExtensions extensions = IClientItemExtensions.of(stack);
+        int color = ARGB.opaque(extensions.getDefaultDyeColor(stack));
+        collector.order(1)
+                .submitModelPart(
+                        gloveArm,
+                        poseStack,
+                        RenderTypes.armorCutoutNoCull(texture),
+                        packedLight,
+                        OverlayTexture.NO_OVERLAY,
+                        null,
+                        color,
+                        null
+                );
 
         ArmorStyle style = stack.get(AetherIIDataComponents.ARMOR_STYLE);
         if (style != null && Minecraft.getInstance().level != null) {
             TextureAtlasSprite sprite = ARMOR_STYLE_SPRITE_LOOKUP.apply(new ArmorStyle.SpriteKey(Minecraft.getInstance().level.registryAccess(), style, "humanoid_gloves"));
-            collector
+            collector.order(1)
                     .submitModelPart(
                             gloveArm,
                             poseStack,

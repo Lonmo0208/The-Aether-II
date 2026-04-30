@@ -14,6 +14,7 @@ import com.aetherteam.aetherii.client.AetherIIColorResolvers;
 import com.aetherteam.aetherii.client.renderer.block.model.builder.TrunkModelBuilder;
 import com.aetherteam.aetherii.client.renderer.item.color.AetherGrassColorSource;
 import com.aetherteam.aetherii.client.renderer.item.model.*;
+import com.aetherteam.aetherii.client.renderer.item.properties.conditional.HasBlockState;
 import com.aetherteam.aetherii.data.resources.builders.models.AetherIIModelTemplates;
 import com.aetherteam.aetherii.data.resources.builders.models.AetherIITextureMappings;
 import com.aetherteam.aetherii.data.resources.builders.models.AetherIITextureSlots;
@@ -367,7 +368,7 @@ public class AetherIIBlockModelSubProvider extends BlockModelGenerators {
                 .put(TextureSlot.END, blankLocation)
                 .put(TextureSlot.SIDE, baseLocation)
                 .put(TextureSlot.WALL, blockLocation)
-                .put(AetherIITextureSlots.EMISSIVE_END, new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "block/blank"))) //todo
+                .put(AetherIITextureSlots.EMISSIVE_END, new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "block/blank")))
                 .put(AetherIITextureSlots.EMISSIVE_SIDE, TextureMapping.getBlockTexture(base, "_emissive"))
                 .put(AetherIITextureSlots.EMISSIVE_WALL, TextureMapping.getBlockTexture(block, "_emissive"));
         Identifier resourcelocation = AetherIIModelTemplates.EMISSIVE_COLUMN_WALL_INVENTORY.create(block, inventoryMapping, this.modelOutput);
@@ -721,17 +722,16 @@ public class AetherIIBlockModelSubProvider extends BlockModelGenerators {
                         .copyForced(TextureSlot.BOTTOM, TextureSlot.PARTICLE)
                         .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_" + suffix)),
                 this.modelOutput);
-        Identifier overlay = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(
+        Identifier overlay = AetherIIModelTemplates.OVERLAY.createWithSuffix(
                 block,
                 "_" + suffix + "_overlay",
                 new TextureMapping()
-                        .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(block))
-                        .copyForced(TextureSlot.BOTTOM, TextureSlot.PARTICLE)
+                        .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block))
                         .put(TextureSlot.TOP, TextureMapping.getBlockTexture(top))
                         .put(TextureSlot.SIDE, new Material(Identifier.fromNamespaceAndPath(AetherII.MODID, "block/" + suffix + "_overlay"))),
                 this.modelOutput);
         return AetherIIModelTemplates.EMPTY.extend()
-                .customLoader(CompositeModelBuilder::new, (builder) -> builder.child("regular", regular).child("base", base).child("overlay", overlay))
+                .customLoader(CompositeModelBuilder::new, (builder) -> builder.child("overlay", overlay).child("base", base).child("default", regular))
                 .build()
                 .createWithSuffix(
                         block,
@@ -1186,14 +1186,14 @@ public class AetherIIBlockModelSubProvider extends BlockModelGenerators {
     }
 
     public void createCopyBlock(Holder<Block> block, String overlay) {
-        Identifier icon = Identifier.fromNamespaceAndPath(AetherII.MODID, overlay);
+        Identifier icon = Identifier.fromNamespaceAndPath(AetherII.MODID, overlay).withPrefix("block/");
         MultiVariant multivariant = plainVariant(ModelTemplates.PARTICLE_ONLY.create(block.value(), TextureMapping.particle(new Material(icon)), this.modelOutput));
         this.blockStateOutput.accept(createSimpleBlock(block.value(), multivariant));
 
-//        CopyBlockSpecialRenderer.Unbaked unbaked = new CopyBlockSpecialRenderer.Unbaked(block, icon);
-//        Identifier base = ModelTemplates.CHEST_INVENTORY.create(block.value().asItem(), TextureMapping.particle(new Material(icon)), this.modelOutput);
-//        Identifier baseFlat = ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(block.value().asItem(), "_flat"), TextureMapping.layer0(new Material(icon)), this.modelOutput);
-//        this.itemModelOutput.accept(block.value().asItem(), ItemModelUtils.conditional(new HasBlockState(), ItemModelUtils.specialModel(base, unbaked), ItemModelUtils.plainModel(baseFlat)));
+        CopyBlockSpecialRenderer.Unbaked unbaked = new CopyBlockSpecialRenderer.Unbaked(block, Identifier.fromNamespaceAndPath(AetherII.MODID, overlay));
+        Identifier base = ModelTemplates.CHEST_INVENTORY.create(block.value().asItem(), TextureMapping.particle(new Material(icon)), this.modelOutput);
+        Identifier baseFlat = ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(block.value().asItem(), "_flat"), TextureMapping.layer0(new Material(icon)), this.modelOutput);
+        this.itemModelOutput.accept(block.value().asItem(), ItemModelUtils.conditional(new HasBlockState(), ItemModelUtils.specialModel(base, unbaked), ItemModelUtils.plainModel(baseFlat)));
     }
 
     public void createLadder(Block block) {

@@ -3,6 +3,7 @@ package com.aetherteam.aetherii.data.resources.builders.worldgen;
 import com.aetherteam.aetherii.AetherII;
 import com.aetherteam.aetherii.data.resources.registries.AetherIIDensityFunctions;
 import com.aetherteam.aetherii.data.resources.registries.AetherIINoises;
+import com.aetherteam.aetherii.world.density.PerlinNoiseFunction;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -78,6 +79,8 @@ public class AetherIIDensityFunctionBuilders {
     public static final ResourceKey<DensityFunction> CLOUDBED_Y_OFFSET = createKey("holy_isles/cloudbed/y_offset");
 
     public static final ResourceKey<DensityFunction> DUNGEONS_INFECTED_BLOCKS = createKey("holy_isles/dungeons/infected_blocks");
+
+    public static final ResourceKey<DensityFunction> DUNGEONS_STRUCTURE_COVER = createKey("holy_isles/dungeons/structure_cover");
 
     private static ResourceKey<DensityFunction> createKey(String name) {
         return ResourceKey.create(Registries.DENSITY_FUNCTION, Identifier.fromNamespaceAndPath(AetherII.MODID, name));
@@ -485,6 +488,11 @@ public class AetherIIDensityFunctionBuilders {
     // Coasts
     public static DensityFunction buildCoastNoise(HolderGetter<DensityFunction> function, double value) {
         return DensityFunctions.add(getFunction(function, AetherIIDensityFunctions.COASTS_BASE_NOISE), DensityFunctions.constant(value));
+    }
+
+    // Environmental
+    public static DensityFunction buildBaseEnvironmentalNoise(long seed) {
+        return DensityFunctions.add(DensityFunctions.mul(new PerlinNoiseFunction(new NormalNoise.NoiseParameters(0, 0.75F, 0.5F, 0.25F, 1.0F), 0.05D, 0.0D, seed), DensityFunctions.constant(1.0D)), DensityFunctions.constant(0.1D));
     }
 
     public static DensityFunction getFunction(HolderGetter<DensityFunction> function, ResourceKey<DensityFunction> key) {

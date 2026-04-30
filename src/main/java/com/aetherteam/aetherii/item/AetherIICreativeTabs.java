@@ -16,10 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemLore;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -654,9 +651,6 @@ public class AetherIICreativeTabs {
                     output.accept(AetherIIBlocks.ROTSHROOM_TOADSTOOL.get());
                     output.accept(AetherIIBlocks.SHELF_ROTSHROOM.get());
                     output.accept(AetherIIBlocks.ROTGROWTH_VINES.get());
-                    output.accept(AetherIIBlocks.LOCKED_BLOCK.get());
-                    output.accept(AetherIIBlocks.BOSS_DOORWAY_BLOCK.get());
-                    output.accept(AetherIIBlocks.TREASURE_DOORWAY_BLOCK.get());
                 }
             }).build());
 
@@ -811,6 +805,7 @@ public class AetherIICreativeTabs {
                 output.accept(AetherIIItems.ENCHANTED_ORANGE.get());
                 output.accept(AetherIIItems.WYNDBERRY.get());
                 output.accept(AetherIIItems.ENCHANTED_WYNDBERRY.get());
+                output.accept(AetherIIItems.GOLDEN_WYNDBERRY.get());
                 output.accept(AetherIIItems.SATIVAL_BULB.get());
                 output.accept(AetherIIItems.SWET_JELLY.get());
                 output.accept(AetherIIItems.ENCHANTED_SWET_JELLY.get());
@@ -879,7 +874,7 @@ public class AetherIICreativeTabs {
                 output.accept(AetherIIItems.IRRADIATED_TOOL.get());
                 output.accept(AetherIIItems.IRRADIATED_CHUNK.get());
                 output.accept(AetherIIItems.IRRADIATED_DUST.get());
-//                output.accept(AetherIIItems.ZEPHYR_HUSK.get());
+//                output.accept(AetherIIItems.ZEPHYR_HUSK.get()); // TODO WIP ALPHA THINGS
 //                output.accept(AetherIIItems.CHARGE_CATALYST.get());
 //                output.accept(AetherIIItems.ARKENIUM_CORE.get());
 //                output.accept(AetherIIItems.GRAVITITE_CORE.get());
@@ -977,6 +972,9 @@ public class AetherIICreativeTabs {
     public static void addCreativeModTabContents(BuildCreativeModeTabContentsEvent event) {
         if (event.hasPermissions() && event.getTabKey().compareTo(CreativeModeTabs.OP_BLOCKS) == 0) {
             event.accept(getMoaBook());
+            event.accept(AetherIIBlocks.LOCKED_BLOCK.get());
+            event.accept(AetherIIBlocks.BOSS_DOORWAY_BLOCK.get());
+            event.accept(AetherIIBlocks.TREASURE_DOORWAY_BLOCK.get());
         }
     }
 }

@@ -1,0 +1,22 @@
+name: Publish
+on: [workflow_dispatch] # Manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    container:
+      image: mcr.microsoft.com/openjdk/jdk:25-ubuntu
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+            if [ "${{ github.event.sender.login }}" = "OzPayn" ] || [ "${{ github.event.sender.login }}" = "bconlon1" ]; then
+              chmod +x ./gradlew
+              ./gradlew build publishMods
+            fi
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

@@ -44,6 +44,7 @@ import net.neoforged.neoforge.event.AddAttributeTooltipsEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.apache.commons.lang3.tuple.Triple;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +65,6 @@ public class AetherIIClientEventListeners {
 
         // Entity
         bus.addListener(AetherIIClientEventListeners::doRenderNameTag);
-
-        // World
-        bus.addListener(AetherIIClientEventListeners::onComputeFogColor);
 
         // Audio
         bus.addListener(AetherIIClientEventListeners::onPlaySound);
@@ -170,36 +168,6 @@ public class AetherIIClientEventListeners {
         PoseStack poseStack = event.getPoseStack();
 
         RenderHooks.offsetNameTag(renderState, poseStack);
-    }
-
-    public static void onComputeFogColor(ViewportEvent.ComputeFogColor event) {
-        Camera camera = event.getCamera();
-        float red = event.getRed();
-        float green = event.getGreen();
-        float blue = event.getBlue();
-
-        Triple<Float, Float, Float> renderFogColors = RenderHooks.adjustHeightBasedFogColors(camera, red, green, blue);
-        if (renderFogColors != null) {
-            red = renderFogColors.getLeft();
-            green = renderFogColors.getMiddle();
-            blue = renderFogColors.getRight();
-        }
-        Triple<Float, Float, Float> adjustWeatherFogColors = RenderHooks.adjustWeatherFogColors(camera, red, green, blue);
-        if (adjustWeatherFogColors != null) {
-            red = adjustWeatherFogColors.getLeft();
-            green = adjustWeatherFogColors.getMiddle();
-            blue = adjustWeatherFogColors.getRight();
-        }
-
-        if (event.getRed() != red) {
-            event.setRed(red);
-        }
-        if (event.getGreen() != green) {
-            event.setGreen(green);
-        }
-        if (event.getBlue() != blue) {
-            event.setBlue(blue);
-        }
     }
 
     public static void onPlaySound(PlaySoundEvent event) {

@@ -8,6 +8,7 @@ import com.aetherteam.aetherii.effect.buildup.EffectBuildupPresets;
 import com.aetherteam.aetherii.entity.passive.Moa;
 import com.aetherteam.aetherii.item.AetherIIItems;
 import com.aetherteam.aetherii.item.components.AetherIIDataComponents;
+import com.aetherteam.aetherii.item.components.BuildupContents;
 import com.aetherteam.aetherii.recipe.book.AlkahestPurifierBookCategory;
 import com.aetherteam.aetherii.recipe.book.AltarBookCategory;
 import com.aetherteam.aetherii.recipe.recipes.OutputEntry;
@@ -20,6 +21,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.item.*;
@@ -31,6 +33,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class AetherIIRecipeData extends AetherIIRecipeProvider {
@@ -114,9 +117,39 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
                 AetherIIBlocks.YELLOW_SKYROOT_BED.asItem(),
                 AetherIIBlocks.WHITE_SKYROOT_BED.asItem()
         );
+        Map<DyeColor, Item> dyeMap = Map.ofEntries(
+                Map.entry(DyeColor.BLACK, Items.BLACK_DYE),
+                Map.entry(DyeColor.BLUE, Items.BLUE_DYE),
+                Map.entry(DyeColor.BROWN, Items.BROWN_DYE),
+                Map.entry(DyeColor.CYAN, Items.CYAN_DYE),
+                Map.entry(DyeColor.GRAY, Items.GRAY_DYE),
+                Map.entry(DyeColor.GREEN, Items.GREEN_DYE),
+                Map.entry(DyeColor.LIGHT_BLUE, Items.LIGHT_BLUE_DYE),
+                Map.entry(DyeColor.LIGHT_GRAY, Items.LIGHT_GRAY_DYE),
+                Map.entry(DyeColor.LIME, Items.LIME_DYE),
+                Map.entry(DyeColor.MAGENTA, Items.MAGENTA_DYE),
+                Map.entry(DyeColor.ORANGE, Items.ORANGE_DYE),
+                Map.entry(DyeColor.PINK, Items.PINK_DYE),
+                Map.entry(DyeColor.PURPLE, Items.PURPLE_DYE),
+                Map.entry(DyeColor.RED, Items.RED_DYE),
+                Map.entry(DyeColor.YELLOW, Items.YELLOW_DYE),
+                Map.entry(DyeColor.WHITE, Items.WHITE_DYE)
+        );
 
         // Special
         SpecialRecipeBuilder.special(LootRepairRecipe::new).save(this.output, this.name("loot_repairing"));
+
+        this.dyedItem(AetherIIItems.MOA_SADDLE.get(), "dyed_moa_saddle");
+        this.dyedItem(AetherIIItems.BEAST_PELT_BOOTS.get(), "dyed_beast_pelt_armor");
+        this.dyedItem(AetherIIItems.BEAST_PELT_LEGGINGS.get(), "dyed_beast_pelt_armor");
+        this.dyedItem(AetherIIItems.BEAST_PELT_CHESTPLATE.get(), "dyed_beast_pelt_armor");
+        this.dyedItem(AetherIIItems.BEAST_PELT_HELMET.get(), "dyed_beast_pelt_armor");
+        this.dyedItem(AetherIIItems.BEAST_PELT_GLOVES.get(), "dyed_beast_pelt_armor");
+        this.dyedItem(AetherIIItems.BURRUKAI_PLATE_BOOTS.get(), "dyed_burrukai_plate_armor");
+        this.dyedItem(AetherIIItems.BURRUKAI_PLATE_LEGGINGS.get(), "dyed_burrukai_plate_armor");
+        this.dyedItem(AetherIIItems.BURRUKAI_PLATE_CHESTPLATE.get(), "dyed_burrukai_plate_armor");
+        this.dyedItem(AetherIIItems.BURRUKAI_PLATE_HELMET.get(), "dyed_burrukai_plate_armor");
+        this.dyedItem(AetherIIItems.BURRUKAI_PLATE_GLOVES.get(), "dyed_burrukai_plate_armor");
 
         // Blocks
         // Dirt
@@ -1036,7 +1069,7 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
 
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.BUILDING_BLOCKS, AetherIIBlocks.LUCENT_GUARDIAN_ROOTS, 4)
                 .define('#', AetherIIBlocks.GUARDIAN_ROOTS)
-                .define('A', AetherIIItems.AMBROSIUM_SHARD)
+                .define('A', AetherIITags.Items.GEMS_AMBROSIUM)
                 .pattern("#A")
                 .pattern("A#")
                 .unlockedBy(getHasName(AetherIIBlocks.GUARDIAN_ROOTS), has(AetherIIBlocks.GUARDIAN_ROOTS))
@@ -1044,7 +1077,7 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
 
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.BUILDING_BLOCKS, AetherIIBlocks.GUARDIAN_LAMP)
                 .define('#', AetherIITags.Items.GUARDIAN_LOGS)
-                .define('A', AetherIIItems.AMBROSIUM_SHARD)
+                .define('A', AetherIITags.Items.GEMS_AMBROSIUM)
                 .pattern("#")
                 .pattern("A")
                 .pattern("#")
@@ -1122,11 +1155,11 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
         // Arkenium Blocks
         this.doorBuilder(AetherIIBlocks.ARKENIUM_DOOR, Ingredient.of(AetherIIItems.ARKENIUM_PLATE.get())).unlockedBy(getHasName(AetherIIItems.ARKENIUM_PLATE.get()), has(AetherIIItems.ARKENIUM_PLATE.get())).save(this.output);
         this.twoByTwoPacker(RecipeCategory.REDSTONE, AetherIIBlocks.ARKENIUM_TRAPDOOR, AetherIIItems.ARKENIUM_PLATE);
-        this.shaped(RecipeCategory.DECORATIONS, AetherIIBlocks.ARKENIUM_BARS, 16)
-                .define('#', AetherIIItems.ARKENIUM_PLATE.get())
+        this.shaped(RecipeCategory.DECORATIONS, AetherIIBlocks.ARKENIUM_BARS, 32)
+                .define('#', AetherIITags.Items.PLATES_ARKENIUM)
                 .pattern("###")
                 .pattern("###")
-                .unlockedBy("has_arkenium_plate", this.has(AetherIIItems.ARKENIUM_PLATE.get()))
+                .unlockedBy("has_arkenium_plate", this.has(AetherIITags.Items.PLATES_ARKENIUM))
                 .save(this.output);
         this.stonecuttingRecipe(this.output, RecipeCategory.DECORATIONS, AetherIIBlocks.FLORAL_ARKENIUM_BARS.get(), AetherIIBlocks.ARKENIUM_BARS.get());
         this.stonecuttingRecipe(this.output, RecipeCategory.DECORATIONS, AetherIIBlocks.PATTERNED_ARKENIUM_BARS.get(), AetherIIBlocks.ARKENIUM_BARS.get());
@@ -1176,11 +1209,11 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
 
         // Utility
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.DECORATIONS, AetherIIBlocks.AMBROSIUM_TORCH.get(), 4)
-                .define('A', AetherIIItems.AMBROSIUM_SHARD.get())
+                .define('A', AetherIITags.Items.GEMS_AMBROSIUM)
                 .define('/', AetherIITags.Items.RODS_SKYROOT)
                 .pattern("A")
                 .pattern("/")
-                .unlockedBy(getHasName(AetherIIItems.AMBROSIUM_SHARD.get()), has(AetherIIItems.AMBROSIUM_SHARD.get()))
+                .unlockedBy("has_ambrosium_shard", has(AetherIITags.Items.GEMS_AMBROSIUM))
                 .save(this.output);
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.DECORATIONS, AetherIIBlocks.ARKENIUM_LANTERN.get())
                 .define('#', AetherIIItems.ARKENIUM_CHIP.get())
@@ -1274,13 +1307,13 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
                 .save(this.output);
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.DECORATIONS, AetherIIBlocks.AMBROSIUM_CAMPFIRE.get())
                 .define('L', ItemTags.LOGS)
-                .define('S', AetherIIItems.SKYROOT_STICK) //TODO TAG
-                .define('#', AetherIIItems.AMBROSIUM_SHARD) //TODO TAG
+                .define('S', AetherIITags.Items.RODS_SKYROOT)
+                .define('#', AetherIITags.Items.GEMS_AMBROSIUM)
                 .pattern(" S ")
                 .pattern("S#S")
                 .pattern("LLL")
-                .unlockedBy("has_stick", has(AetherIIItems.SKYROOT_STICK))
-                .unlockedBy("has_ambrosium", has(AetherIIItems.AMBROSIUM_SHARD))
+                .unlockedBy("has_stick", has(AetherIITags.Items.RODS_SKYROOT))
+                .unlockedBy("has_ambrosium_shard", has(AetherIITags.Items.GEMS_AMBROSIUM))
                 .save(this.output);
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.DECORATIONS, AetherIIBlocks.SKYROOT_CHEST.get())
                 .define('#', AetherIITags.Items.PLANKS_CRAFTING)
@@ -1656,12 +1689,12 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
                 .unlockedBy("has_scatterglass", has(AetherIIBlocks.SCATTERGLASS.get()))
                 .save(this.output);
         ShapedRecipeBuilder.shaped(getter,RecipeCategory.MISC, Items.GLOWSTONE_DUST, 4)
-                .define('#', AetherIIItems.AMBROSIUM_SHARD)
-                .define('@', Items.QUARTZ)
+                .define('#', AetherIITags.Items.GEMS_AMBROSIUM)
+                .define('@', Tags.Items.GEMS_QUARTZ)
                 .pattern("#@")
                 .pattern("@#")
-                .unlockedBy("has_ambrosium_shard", has(AetherIIItems.AMBROSIUM_SHARD.get()))
-                .unlockedBy("has_quartz", has(Items.QUARTZ))
+                .unlockedBy("has_ambrosium_shard", has(AetherIITags.Items.GEMS_AMBROSIUM))
+                .unlockedBy("has_quartz", has(Tags.Items.GEMS_QUARTZ))
                 .save(this.output, this.name("aether_glowstone_dust"));
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.MISC, AetherIIItems.MUSIC_PLAYER.get())
                 .define('A', AetherIIItems.GOLDEN_AMBER)
@@ -1671,6 +1704,10 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
                 .pattern(" AF")
                 .unlockedBy("has_disc", has(AetherIITags.Items.ENGRAVED_DISCS))
                 .save(this.output);
+        ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, Items.QUARTZ)
+                .requires(DataComponentIngredient.of(false, new ItemStackTemplate(Items.QUARTZ, 1, DataComponentPatch.builder().set(DataComponents.ITEM_NAME, Component.translatable("item.aether_ii.aether_quartz")).build())))
+                .unlockedBy("has_aether_quartz", has(Items.QUARTZ))
+                .save(this.output, this.name("quartz_from_aether_quartz"));
 
         this.smeltingOreRecipe(Items.QUARTZ, AetherIIBlocks.HOLYSTONE_QUARTZ_ORE.get(), 0.5F).group("quartz").save(this.output, this.name("quartz_from_smelting_holystone_quartz_ore"));
         this.blastingOreRecipe(Items.QUARTZ, AetherIIBlocks.HOLYSTONE_QUARTZ_ORE.get(), 0.5F).group("quartz").save(this.output, this.name("quartz_from_blasting_holystone_quartz_ore"));
@@ -2234,14 +2271,14 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
         this.altarEnchanting(RecipeCategory.MISC, AltarBookCategory.MISC, AetherIIItems.GRAVITITE_PLATE, AetherIIBlocks.GRAVITITE_ORE, 4, 0.0F).group("gravitite").save(this.output, this.name("gravitite_plates_from_gravitite_ore"));
         this.altarEnchanting(RecipeCategory.MISC, AltarBookCategory.MISC, AetherIIItems.GRAVITITE_PLATE, AetherIIBlocks.UNDERSHALE_GRAVITITE_ORE, 4, 0.0F).group("gravitite").save(this.output, this.name("gravitite_plates_from_undershale_gravitite_ore"));
 
-//        for (var featherColor : Moa.FeatherColor.values()) { //todo
-//            var featherDye = DyeItem.byId(featherColor.dyeColor.getId());
-//            ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, featherDye, 1)
-//                    .requires(DataComponentIngredient.of(false, AetherIIDataComponents.FEATHER_COLOR, featherColor, AetherIIItems.MOA_FEATHER))
-//                    .group(getItemName(featherDye))
-//                    .unlockedBy(getHasName(AetherIIItems.MOA_FEATHER), has(AetherIIItems.MOA_FEATHER))
-//                    .save(this.output, this.name(getItemName(featherDye) + "_from_" + featherColor.getSerializedName() + "_moa_feather"));
-//        }
+        for (Moa.FeatherColor featherColor : Moa.FeatherColor.values()) {
+            Item featherDye = dyeMap.get(featherColor.dyeColor);
+            ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, featherDye, 1)
+                    .requires(DataComponentIngredient.of(false, AetherIIDataComponents.FEATHER_COLOR, featherColor, AetherIIItems.MOA_FEATHER))
+                    .group(getItemName(featherDye))
+                    .unlockedBy(getHasName(AetherIIItems.MOA_FEATHER), has(AetherIIItems.MOA_FEATHER))
+                    .save(this.output, this.name(getItemName(featherDye) + "_from_" + featherColor.getSerializedName() + "_moa_feather"));
+        }
 
         this.oneToOneConversionRecipe(Items.PURPLE_DYE, AetherIIItems.COCKATRICE_FEATHER.get(), "purple_dye");
 
@@ -2327,7 +2364,7 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
 
 
         ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, new ItemStackTemplate(AetherIIItems.SPLINT.get()))
-                .requires(AetherIIItems.SKYROOT_STICK.get())
+                .requires(AetherIITags.Items.RODS_SKYROOT)
                 .requires(AetherIITags.Items.CLOUDWOOL)
                 .unlockedBy("has_cloudwool", has(AetherIITags.Items.CLOUDWOOL))
                 .save(this.output);
@@ -2352,17 +2389,17 @@ public class AetherIIRecipeData extends AetherIIRecipeProvider {
         ShapelessRecipeBuilder.shapeless(getter, RecipeCategory.MISC, new ItemStackTemplate(AetherIIItems.VALKYRIE_TEA.get()))
                 .requires(AetherIIItems.WATER_VIAL.get())
                 .requires(AetherIIItems.VALKYRIE_WINGS.get())
-                .requires(AetherIIItems.AMBROSIUM_SHARD.get())
+                .requires(AetherIITags.Items.GEMS_AMBROSIUM)
                 .unlockedBy("has_water_vial", has(AetherIIItems.WATER_VIAL.get()))
                 .save(this.output);
 
         ShapedRecipeBuilder.shaped(getter, RecipeCategory.MISC, new ItemStackTemplate(AetherIIItems.HEALING_STONE, 1, DataComponentPatch.builder().set(AetherIIDataComponents.HEALING_STONE_CHARGES.get(), 1).build()))
-                .define('A', AetherIIItems.AMBROSIUM_SHARD.get())
+                .define('A', AetherIITags.Items.GEMS_AMBROSIUM)
                 .define('H', AetherIITags.Items.STONE_CRAFTING)
                 .pattern("HAH")
                 .pattern("AAA")
                 .pattern("HAH")
-                .unlockedBy("has_ambrosium_shard", has(AetherIIItems.AMBROSIUM_SHARD.get()))
+                .unlockedBy("has_ambrosium_shard", has(AetherIITags.Items.GEMS_AMBROSIUM))
                 .save(this.output);
 
         this.altarEnchanting(RecipeCategory.MISC, AltarBookCategory.MISC,

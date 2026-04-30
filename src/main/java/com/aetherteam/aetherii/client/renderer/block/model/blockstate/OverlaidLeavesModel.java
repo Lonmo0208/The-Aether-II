@@ -1,9 +1,13 @@
 package com.aetherteam.aetherii.client.renderer.block.model.blockstate;
 
+import com.aetherteam.aetherii.AetherII;
 import com.aetherteam.aetherii.block.natural.AetherLeavesBlock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
@@ -12,11 +16,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.DelegateBlockStateModel;
+import net.neoforged.neoforge.client.model.quad.BakedColors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class OverlaidLeavesModel extends DelegateBlockStateModel {
+public class OverlaidLeavesModel extends BreakingFixModel {
+    private static final Direction[] DIRECTIONS = Arrays.copyOfRange(Direction.values(), 0, 7);
+
     public OverlaidLeavesModel(BlockStateModel originalModel) {
         super(originalModel);
     }
@@ -25,47 +33,68 @@ public class OverlaidLeavesModel extends DelegateBlockStateModel {
     public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
         List<BlockStateModelPart> newParts = new ArrayList<>();
         this.delegate.collectParts(level, pos, state, random, newParts);
-        int regularIndex = 2;
-        int baseIndex = 1;
-        int overlayIndex = 0;
         for (BlockStateModelPart part : newParts) {
-            if (part instanceof SimpleModelWrapper simpleModelWrapper) {
-                QuadCollection.Builder baseBuilder = new QuadCollection.Builder();
-                QuadCollection.Builder overlayBuilder = new QuadCollection.Builder();
-                for (Direction direction : Direction.values()) {
-                    List<BakedQuad> quads = simpleModelWrapper.getQuads(direction);
-                    if (quads.size() <= 2) {
-                        if (direction == null) {
-                            baseBuilder.addUnculledFace(quads.getFirst());
+            QuadCollection.Builder builder = new QuadCollection.Builder();
+            for (Direction direction : DIRECTIONS) {
+                List<BakedQuad> quads = part.getQuads(direction);
+                if (direction != null && direction.getAxis().isHorizontal()) {
+                    if (quads.size() >= 2) {
+                        int baseIndex = 0;
+                        int defaultIndex = 1;
+                        int overlayIndex = 2;
+                        BlockState relativeState = level.getBlockState(pos.relative(direction));
+                        if (!(relativeState.getBlock() instanceof AetherLeavesBlock)
+                                || (relativeState.getValue(AetherLeavesBlock.SNOWY) != state.getValue(AetherLeavesBlock.SNOWY))
+                                || (relativeState.getValue(AetherLeavesBlock.MOSSY) != state.getValue(AetherLeavesBlock.MOSSY))) {
+                            builder.addCulledFace(direction, this.convertQuad(quads.get(baseIndex)));
+                            builder.addCulledFace(direction, this.convertQuad(quads.get(overlayIndex), true));
                         } else {
-                            baseBuilder.addCulledFace(direction, quads.getFirst());
+                            builder.addCulledFace(direction, this.convertQuad(quads.get(defaultIndex)));
                         }
                     } else {
-                        if (direction == null) {
-                            baseBuilder.addUnculledFace(quads.get(baseIndex));
-                            overlayBuilder.addUnculledFace(quads.get(overlayIndex));
-                        } else {
-                            BlockState relativeState = level.getBlockState(pos.relative(direction));
-                            if (!relativeState.is(state.getBlock())
-                                    || (relativeState.getValue(AetherLeavesBlock.SNOWY) != state.getValue(AetherLeavesBlock.SNOWY))
-                                    || (relativeState.getValue(AetherLeavesBlock.MOSSY) != state.getValue(AetherLeavesBlock.MOSSY))) {
-                                baseBuilder.addCulledFace(direction, quads.get(baseIndex));
-                                overlayBuilder.addCulledFace(direction, quads.get(overlayIndex));
-                            } else {
-                                overlayBuilder.addCulledFace(direction, quads.get(regularIndex));
-                            }
+                        for (BakedQuad quad : quads) {
+                            builder.addCulledFace(direction, this.convertQuad(quad));
                         }
                     }
-                }
-                QuadCollection baseQuads = baseBuilder.build();
-                QuadCollection overlayQuads = overlayBuilder.build();
-                if (!baseQuads.getAll().isEmpty()) {
-                    parts.add(new SimpleModelWrapper(baseBuilder.build(), simpleModelWrapper.useAmbientOcclusion(), simpleModelWrapper.particleMaterial()));
-                }
-                if (!overlayQuads.getAll().isEmpty()) {
-                    parts.add(new SimpleModelWrapper(overlayBuilder.build(), simpleModelWrapper.useAmbientOcclusion(), simpleModelWrapper.particleMaterial()));
+                } else if (direction != null && direction.getAxis().isVertical()) {
+                    for (BakedQuad quad : quads) {
+                        builder.addCulledFace(direction, this.convertQuad(quad));
+                    }
+                } else {
+                    for (BakedQuad quad : quads) {
+                        builder.addUnculledFace(this.convertQuad(quad));
+                    }
                 }
             }
+            QuadCollection collection = builder.build();
+            if (!collection.getAll().isEmpty()) {
+                parts.add(new SimpleModelWrapper(builder.build(), part.useAmbientOcclusion(), part.particleMaterial()));
+            }
         }
+    }
+
+    public BakedQuad convertQuad(BakedQuad oldQuad) {
+        return this.convertQuad(oldQuad, false);
+    }
+
+    public BakedQuad convertQuad(BakedQuad oldQuad, boolean forceCutout) {
+        ChunkSectionLayer layer = Minecraft.getInstance().gameRenderer.getGameRenderState().optionsRenderState.cutoutLeaves ? oldQuad.materialInfo().layer() : ChunkSectionLayer.SOLID;
+        if (forceCutout) {
+            layer = ChunkSectionLayer.CUTOUT;
+        }
+        return new BakedQuad(
+                oldQuad.position0(),
+                oldQuad.position1(),
+                oldQuad.position2(),
+                oldQuad.position3(),
+                oldQuad.packedUV0(),
+                oldQuad.packedUV1(),
+                oldQuad.packedUV2(),
+                oldQuad.packedUV3(),
+                oldQuad.direction(),
+                new BakedQuad.MaterialInfo(oldQuad.materialInfo().sprite(), layer, oldQuad.materialInfo().itemRenderType(), oldQuad.materialInfo().tintIndex(), oldQuad.materialInfo().shade(), oldQuad.materialInfo().lightEmission(), oldQuad.materialInfo().ambientOcclusion()),
+                oldQuad.bakedNormals(),
+                oldQuad.bakedColors()
+        );
     }
 }
